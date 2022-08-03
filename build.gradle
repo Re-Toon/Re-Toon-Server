@@ -20,11 +20,36 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'junit:junit:4.13.2'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    //JPA에 관한 의존성 추가
+    implementation 'javax.xml.bind:jaxb-api'
+    //JPA 적용
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' //객체지향적으로 데이터 접근 시에 활용
+    //Oauth2 적용
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    //Spring Security 적용
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    //validation 적용
+    implementation 'org.springframework.boot:spring-boot-starter-validation' //데이터 유효성 검사 시에 활용
+    //log4j2 적용, web과 같이 사용 시에 충돌 발생
+    // implementation 'org.springframework.boot:spring-boot-starter-log4j2' //디버깅 도구로 활용
+    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0' //validation에 관한 추가적인 적용
+    //jwt에 관한 의존성 주입
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    //Spring Boot와 MySQL 연동
+    runtimeOnly 'mysql:mysql-connector-java'
+    //스프링 시큐리티 테스트 적용
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
