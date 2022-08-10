@@ -96,6 +96,7 @@ public class KakaoOauth implements SocialOauth {
         //카카오 로그인의 경우, 사용자 정보를 받아올 시에 필요
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
         //헤더를 넣고, 객체를 구성
         HttpEntity request = new HttpEntity(headers);

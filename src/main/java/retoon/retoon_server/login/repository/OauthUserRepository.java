@@ -8,5 +8,4 @@ public interface OauthUserRepository extends JpaRepository<OauthUser, Integer> {
 
     //이메일로 사용자 조회
     OauthUser findByEmail(String email);
-
 }

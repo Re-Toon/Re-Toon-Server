@@ -3,9 +3,7 @@ package retoon.retoon_server.login;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.login.model.GetSocialUserRes;
 import retoon.retoon_server.login.repository.OauthUser;
 import retoon.retoon_server.login.repository.OauthUserRepository;
@@ -15,7 +13,6 @@ import retoon.retoon_server.login.social.NaverOauth;
 import retoon.retoon_server.login.social.KakaoOauth;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.util.Optional;
 
