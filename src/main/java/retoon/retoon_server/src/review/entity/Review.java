@@ -1,40 +1,44 @@
 package retoon.retoon_server.src.review.entity;
 
 import lombok.*;
-import org.apache.catalina.User;
-import retoon.retoon_server.src.user.UserDao;
 import retoon.retoon_server.src.user.repository.UserProfile;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity
 @Table(name = "review")
 public class Review {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int reviewIdx;
+    private Long reviewIdx;
 
     @ManyToOne
-    @JoinColumn(name = "userIdx")
+    @JoinColumn(name = "user_idx")
     private UserProfile user;
 
-    @Column(length = 45)
-    private String starRate;
+    private int webtoonIdx;
+
+    @Column
+    private int reviewStarRate;
 
     @Column(columnDefinition = "TEXT")
     private String reviewText;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdAT;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAT;
+    private LocalDateTime createdAT;
 
-    @Column(length = 45, nullable = false)
-    private String status;
+    private LocalDateTime updatedAT;
+
+    @Column
+    private boolean isSpoiler;
+
+    @Column(columnDefinition = "varchar(45) default 'ACTIVE'", nullable = false) // review 삭제를 위한 column 추가
+    private String status = "ACTIVE";
 }

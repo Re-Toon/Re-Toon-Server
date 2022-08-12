@@ -71,25 +71,4 @@ public class JwtService {
         // 3. userIdx 추출
         return claims.getBody().get("userIdx",Integer.class);
     }
-
-    // Jwt 검증
-    public Boolean verifyJwt(String jwt) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
-                    .parseClaimsJws(jwt)
-                    .getBody();
-            Long userId = claims.get("userId", Long.class);
-            if (!isValidUser(userId)) return false;
-        } catch (ExpiredJwtException e) {       // 토큰 만료
-            System.out.println(e);
-            return false;
-        } catch (Exception e) {         // 그 외 에러
-            System.out.println(e);
-            return false;
-        }
-        return true;
-    }
-
-
 }
