@@ -1,28 +1,162 @@
 package retoon.retoon_server.src.user;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
+import retoon.retoon_server.src.user.information.GetSocialUserRes;
+import retoon.retoon_server.src.user.repository.UserRepository;
+import retoon.retoon_server.src.user.social.GoogleOauth;
+import retoon.retoon_server.src.user.social.KakaoOauth;
+import retoon.retoon_server.src.user.social.NaverOauth;
+import retoon.retoon_server.src.user.social.SocialLoginType;
+import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.PatchUserReq;
 import retoon.retoon_server.src.user.model.PostUserReq;
-import retoon.retoon_server.src.user.repository.Genre;
-import retoon.retoon_server.src.user.repository.UserProfile;
+import retoon.retoon_server.src.user.entity.Genre;
+import retoon.retoon_server.src.user.entity.UserProfile;
 import retoon.retoon_server.src.user.repository.UserProfileRepository;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    // 구글, 카카오, 네이버 oauth 객체 생성
+    @Autowired
+    private final GoogleOauth googleOauth;
+    @Autowired
+    private final KakaoOauth kakaoOauth;
+    @Autowired
+    private final NaverOauth naverOauth;
+
+    private final HttpServletResponse response;
     @Autowired
     private final UserProfileRepository userProfileRepository;
+    @Autowired
+    private final UserRepository userRepository;
+
+    //enum type 인식
+    public void request(SocialLoginType socialLoginType){
+        //redirect 처리를 할 url 생성
+        String redirectURL;
+        switch(socialLoginType){
+            case GOOGLE:{
+                redirectURL = googleOauth.getOauthRedirectURL();
+            }break;
+            case KAKAO:{
+                redirectURL = kakaoOauth.getOauthRedirectURL();
+            }break;
+            case NAVER:{
+                redirectURL = naverOauth.getOauthRedirectURL();
+            }break;
+            default:{
+                throw new IllegalArgumentException("등록되지 않은 SNS 로그인 형식입니다.");
+            }
+        }
+        try{
+            //정해진 url로 sendRedirect 처리
+            System.out.println(response.getStatus());
+            response.sendRedirect(redirectURL); //로그인 페이지 이동 및 로그인 확인
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public String requestAccessToken(SocialLoginType socialLoginType, String code) throws JsonProcessingException {
+        switch (socialLoginType){
+            case GOOGLE:{
+                try {
+                    return googleOauth.requestAccessToken(code);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case KAKAO:{
+                try {
+                    return kakaoOauth.requestAccessToken(code);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            case NAVER:{
+                try{
+                    return naverOauth.requestAccessToken(code);
+                }catch (JsonProcessingException e){
+                    throw new RuntimeException(e);
+                }
+            }
+            default:{
+                // validation 처리로 변경
+                throw new IllegalArgumentException("등록되지 않은 SNS 로그인 형식입니다.");
+            }
+        }
+    }
+
+    public GetSocialUserRes getUserInfo(SocialLoginType socialLoginType, String accessToken){
+        switch (socialLoginType){
+            case GOOGLE:{
+                return googleOauth.getUserInfo(accessToken);
+            }
+            case KAKAO:{
+                return kakaoOauth.getUserInfo(accessToken);
+            }
+            case NAVER:{
+                return naverOauth.getUserInfo(accessToken);
+            }
+            default:{
+                // validation 처리로 변경
+                throw new IllegalArgumentException("등록되지 않은 SNS 로그인 형식입니다.");
+            }
+        }
+    }
+
+    public void requestlogout(SocialLoginType socialLoginType){
+        String logoutUrl;
+        switch (socialLoginType){
+            case GOOGLE:{
+                logoutUrl = googleOauth.logout();
+            }break;
+            case KAKAO:{
+                logoutUrl = kakaoOauth.logout();
+            }break;
+            case NAVER:{
+                logoutUrl = naverOauth.logout();
+            }break;
+            default:{
+                // validation 처리로 변경
+                throw new IllegalArgumentException("등록되지 않은 SNS 로그인 형식입니다.");
+            }
+        }
+        try{
+            //정해진 url로 sendRedirect 처리
+            response.sendRedirect(logoutUrl); //로그아웃 페이지 이동
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isJoinedUser(String email){
+        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(email));
+        //사용자가 존재하는지의 여부를 반환
+        return user.isPresent();
+    }
+
+    public void SignUp(GetSocialUserRes socialUserRes, String accessToken){
+        User user = socialUserRes.toUser(accessToken);
+        userRepository.save(user);
+        userRepository.flush();
+    }
 
     public void createProfile(PostUserReq postUserReq) throws BaseException {
         UserProfile makeProfile = new UserProfile(); // 새로운 유저 프로필 객체 생성
         makeProfile.setNickname(postUserReq.getNickname()); // 닉네임 설정
         makeProfile.setIntroduce(postUserReq.getIntroduce()); // 자기소개 설정
-        makeProfile.setImgUrl(postUserReq.getImgUrl()); //
+        makeProfile.setImgUrl(postUserReq.getImgUrl()); // 이미지 설정
 
         // 반복적으로 장르 리스트를 삽입
         for(int i = 0; i < postUserReq.getGenres().size(); i++){
@@ -35,8 +169,6 @@ public class UserService {
         userProfileRepository.save(makeProfile);
         // DB 반영
         userProfileRepository.flush();
-        // 생성된 유저 프로필 정보를 반환
-        //return makeProfile;
     }
 
     // 프로필 수정하는 함수
@@ -61,8 +193,6 @@ public class UserService {
             userProfileRepository.save(newProfile);
             userProfileRepository.flush(); // DB 반영
         }
-        // 수정된 프로필 정보를 반환
-        // return newProfile;
     }
 
     public void deleteProfile(int userIdx) throws BaseException {
