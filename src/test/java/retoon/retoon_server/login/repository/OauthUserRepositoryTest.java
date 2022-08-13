@@ -7,13 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import retoon.retoon_server.src.login.repository.OauthUser;
-import retoon.retoon_server.src.login.repository.OauthUserRepository;
 
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class OauthUserRepositoryTest {
+    /*
     @Autowired
     OauthUserRepository oauthUserRepository;
 
@@ -27,5 +26,5 @@ public class OauthUserRepositoryTest {
         oauthUserRepository.save(oauthUser);
         oauthUserRepository.flush();
     }
-
+*/
 }
