@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.social;
+package retoon.retoon_server.src.login.social;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,8 +8,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import retoon.retoon_server.login.model.GetSocialUserRes;
-import retoon.retoon_server.login.token.NaverTokenRes;
+import retoon.retoon_server.src.login.model.GetSocialUserRes;
+import retoon.retoon_server.src.login.token.NaverTokenRes;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

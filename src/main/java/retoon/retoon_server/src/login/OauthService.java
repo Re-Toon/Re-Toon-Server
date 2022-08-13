@@ -1,16 +1,16 @@
-package retoon.retoon_server.login;
+package retoon.retoon_server.src.login;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import retoon.retoon_server.login.model.GetSocialUserRes;
-import retoon.retoon_server.login.repository.OauthUser;
-import retoon.retoon_server.login.repository.OauthUserRepository;
-import retoon.retoon_server.login.social.SocialLoginType;
-import retoon.retoon_server.login.social.GoogleOauth;
-import retoon.retoon_server.login.social.NaverOauth;
-import retoon.retoon_server.login.social.KakaoOauth;
+import retoon.retoon_server.src.login.model.GetSocialUserRes;
+import retoon.retoon_server.src.login.repository.OauthUser;
+import retoon.retoon_server.src.login.repository.OauthUserRepository;
+import retoon.retoon_server.src.login.social.SocialLoginType;
+import retoon.retoon_server.src.login.social.GoogleOauth;
+import retoon.retoon_server.src.login.social.NaverOauth;
+import retoon.retoon_server.src.login.social.KakaoOauth;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

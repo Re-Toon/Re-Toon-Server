@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.converter;
+package retoon.retoon_server.src.login.converter;
 
 /**
  * Controller 에서 Social Login Type parameter
@@ -8,7 +8,7 @@ package retoon.retoon_server.login.converter;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import retoon.retoon_server.login.social.SocialLoginType;
+import retoon.retoon_server.src.login.social.SocialLoginType;
 
 @Configuration
 public class SocialLoginTypeConverter implements Converter<String, SocialLoginType> {

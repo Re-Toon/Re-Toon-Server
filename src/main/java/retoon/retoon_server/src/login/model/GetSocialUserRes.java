@@ -1,9 +1,9 @@
-package retoon.retoon_server.login.model;
+package retoon.retoon_server.src.login.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
-import retoon.retoon_server.login.repository.OauthUser;
+import retoon.retoon_server.src.login.repository.OauthUser;
 
 //구글, 네이버, 카카오에서 공통적으로 얻어올 수 있는 사용자 정보 객체
 @Getter

@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.model;
+package retoon.retoon_server.src.login.model;
 
 import lombok.*;
 

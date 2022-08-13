@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.repository;
+package retoon.retoon_server.src.login.repository;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;

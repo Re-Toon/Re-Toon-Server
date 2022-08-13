@@ -1,8 +1,7 @@
-package retoon.retoon_server.login.social;
+package retoon.retoon_server.src.login.social;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import retoon.retoon_server.config.BaseResponse;
-import retoon.retoon_server.login.model.GetSocialUserRes;
+import retoon.retoon_server.src.login.model.GetSocialUserRes;
 
 public interface SocialOauth {
     /**

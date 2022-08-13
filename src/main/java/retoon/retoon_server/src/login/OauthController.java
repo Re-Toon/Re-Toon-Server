@@ -1,4 +1,4 @@
-package retoon.retoon_server.login;
+package retoon.retoon_server.src.login;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseResponse;
-import retoon.retoon_server.login.model.GetSocialUserRes;
-import retoon.retoon_server.login.model.PostSocialUserRes;
-import retoon.retoon_server.login.repository.OauthUser;
-import retoon.retoon_server.login.repository.OauthUserRepository;
-import retoon.retoon_server.login.social.SocialLoginType;
+import retoon.retoon_server.src.login.model.GetSocialUserRes;
+import retoon.retoon_server.src.login.model.PostSocialUserRes;
+import retoon.retoon_server.src.login.repository.OauthUser;
+import retoon.retoon_server.src.login.repository.OauthUserRepository;
+import retoon.retoon_server.src.login.social.SocialLoginType;
 import retoon.retoon_server.utils.JwtService;
 
 @RestController //controller + ResponseBody
