@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.login.token;
+package retoon.retoon_server.src.user.token;
 
 import lombok.Data;
 import lombok.Getter;

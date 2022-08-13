@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.login.social;
+package retoon.retoon_server.src.user.social;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,8 +9,8 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import retoon.retoon_server.src.login.model.GetSocialUserRes;
-import retoon.retoon_server.src.login.token.KakaoTokenRes;
+import retoon.retoon_server.src.user.information.GetSocialUserRes;
+import retoon.retoon_server.src.user.token.KakaoTokenRes;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +92,7 @@ public class KakaoOauth implements SocialOauth {
 
     @SuppressWarnings("unchecked") //Map<String, Object> 사용 시 발생하는 경고 제거
     @Override
-    public GetSocialUserRes getUserInfo(String accessToken){
+    public retoon.retoon_server.src.user.information.GetSocialUserRes getUserInfo(String accessToken){
         //카카오 로그인의 경우, 사용자 정보를 받아올 시에 필요
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);

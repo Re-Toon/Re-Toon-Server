@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.login.model;
+package retoon.retoon_server.src.user.information;
 
 import lombok.Data;
 import lombok.Getter;

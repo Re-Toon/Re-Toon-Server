@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.login.social;
+package retoon.retoon_server.src.user.social;
 
 public enum SocialLoginType {
     GOOGLE,

@@ -1,6 +1,8 @@
-package retoon.retoon_server.src.login.model;
+package retoon.retoon_server.src.user.information;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 //실제로 사용하지는 않았으나 응답 객체 형식을 담음
 @Getter
