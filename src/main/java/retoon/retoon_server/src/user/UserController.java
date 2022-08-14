@@ -11,10 +11,10 @@ import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.information.PostSocialUserRes;
-import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.src.user.model.PatchUserReq;
 import retoon.retoon_server.src.user.model.PostUserReq;
 import retoon.retoon_server.src.user.repository.UserRepository;
+import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.utils.JwtService;
 
 @RestController
@@ -79,6 +79,9 @@ public class UserController {
         String jwtToken = jwtService.createJwt(user.getUserIdx());
         log.info(">> SNS 로그인 서버에서 받은 사용자 jwt :: {}", jwtToken);
 
+        //변경된 JWT 토큰 반영하는 부분
+        userService.saveJwtToken(user, jwtToken);
+
         //클라이언트로 보낼 정보 반환
         PostSocialUserRes postSocialUserRes = new PostSocialUserRes(user.getUserIdx(), user.getName(), user.getEmail(), jwtToken);
         return new BaseResponse<>(postSocialUserRes);
@@ -92,6 +95,29 @@ public class UserController {
         log.info(">> 로그아웃에 대한 응답 전송");
         return "로그아웃 성공";
     }
+
+    /**
+     * GET / 로그인 상태 확인 API
+     * parameter userIdx
+     * return String
+     */
+    @GetMapping("/{userIdx}")
+    public BaseResponse<String> verifyUser(@PathVariable("userIdx") int userIdx) {
+        try{
+            int userIdxByJwt = jwtService.getUserIdx();
+            String result;
+            if(userIdx != userIdxByJwt){
+                result = "로그인 되지 않은 유저입니다.";
+            }
+            else{ result = "로그인된 유저입니다."; }
+            return new BaseResponse<>(result);
+        }
+        catch (BaseException e) {
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
 
     /**
      * POST / 프로필 생성 API

@@ -15,6 +15,7 @@ import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.PatchUserReq;
 import retoon.retoon_server.src.user.model.PostUserReq;
+import retoon.retoon_server.utils.JwtService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,6 +35,8 @@ public class UserService {
 
     private final HttpServletResponse response;
 
+    @Autowired
+    private final JwtService jwtService;
     @Autowired
     private final UserRepository userRepository;
 
@@ -147,6 +150,13 @@ public class UserService {
         User user = socialUserRes.toUser(accessToken);
         userRepository.save(user);
         userRepository.flush();
+    }
+
+    public void saveJwtToken(User user, String jwtToken){
+        //변경된 JWT 토큰 반영하는 부분
+        user.setJwtToken(jwtToken); // 유저 객체의 jwt token 수정
+        userRepository.save(user);
+        userRepository.flush(); // DB 반영
     }
 
     public void createProfile(int userIdx, PostUserReq postUserReq) throws BaseException {

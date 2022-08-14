@@ -1,7 +1,6 @@
 package retoon.retoon_server.utils;
 
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -9,8 +8,6 @@ import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.secret.Secret;
 
 import javax.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Date;
 
 import static retoon.retoon_server.config.BaseResponseStatus.*;
