@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.user.repository;
+/*package retoon.retoon_server.src.user.repository;
 
 
 import org.junit.Test;
@@ -69,4 +69,4 @@ public class UserProfileRepositoryTest {
     }
 
 }
-
+*/

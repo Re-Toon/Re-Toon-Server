@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.repository;
+/*package retoon.retoon_server.login.repository;
 
 //import org.junit.jupiter.api.Test;
 import org.junit.Test;
@@ -12,7 +12,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class OauthUserRepositoryTest {
-    /*
+
     @Autowired
     OauthUserRepository oauthUserRepository;
 
@@ -26,5 +26,6 @@ public class OauthUserRepositoryTest {
         oauthUserRepository.save(oauthUser);
         oauthUserRepository.flush();
     }
-*/
+
 }
+*/
