@@ -1,6 +1,5 @@
 package retoon.retoon_server.src.review.entity;
 
-import com.mysql.cj.protocol.ColumnDefinition;
 import lombok.*;
 import retoon.retoon_server.src.user.entity.User;
 import javax.persistence.*;
@@ -40,8 +39,4 @@ public class Review {
     @NonNull
     @Column(columnDefinition = "boolean default false")
     private boolean isSpoiler;
-
-    @NonNull
-    @Column(columnDefinition = "varchar(45) default 'ACTIVE'") // review 삭제를 위한 column 추가
-    private String status;
 }

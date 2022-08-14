@@ -29,7 +29,7 @@ public class JwtService {
                 .setHeaderParam("type","jwt")
                 .claim("userIdx",userIdx)
                 .setIssuedAt(now)
-                .setExpiration(new Date(System.currentTimeMillis()+ (1000L * 60 * 60 * 24 * 365)))
+                .setExpiration(new Date(System.currentTimeMillis()+ (1000L * 60L * 60L * 24L * 365L)))
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
                 .compact();
     }
@@ -68,5 +68,6 @@ public class JwtService {
 
         // 3. userIdx 추출
         return claims.getBody().get("userIdx",Integer.class);
+
     }
 }
