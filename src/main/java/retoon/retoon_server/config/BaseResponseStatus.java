@@ -6,9 +6,9 @@ import lombok.Getter;
 public enum BaseResponseStatus {
 
     /**
-     * 1000 : 요청 성공
+     * 200 : 요청 성공
      */
-    SUCCESS(true, 1000, "요청에 성공하였습니다."),
+    SUCCESS(true, 200, "요청에 성공하였습니다."),
 
     /**
      * 2000 : Request 오류
@@ -18,6 +18,9 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     INVALID_USER_JWT(false,2003,"권한이 없는 유저의 접근입니다."),
+    EMPTY_REVIEW_TEXT(false, 2004, "리뷰 내용을 입력해주세요."),
+    INVALID_REVIEW_STAR_RATE(false, 2005, "올바른 평점 값이 아닙니다."),
+
     FAILED_ON_SERVER(false, 100, "예기치 못한 에러가 발생했습니다.")
     ;
 
