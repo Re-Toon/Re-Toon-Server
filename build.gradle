@@ -46,9 +46,11 @@ dependencies {
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.0' //validation에 관한 추가적인 적용
     // jwt에 관한 의존성 주입
     implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+    // runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.2'
+    // runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.2'
 
     // Spring Boot와 MySQL 연동
     runtimeOnly 'mysql:mysql-connector-java'

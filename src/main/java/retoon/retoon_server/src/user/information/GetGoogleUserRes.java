@@ -1,9 +1,8 @@
-package retoon.retoon_server.login.model;
+package retoon.retoon_server.src.user.information;
 
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import retoon.retoon_server.login.repository.OauthUser;
 
 @Data
 @Getter

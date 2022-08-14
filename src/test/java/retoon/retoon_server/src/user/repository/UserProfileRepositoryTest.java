@@ -1,15 +1,14 @@
-package retoon.retoon_server.src.user.repository;
+/*package retoon.retoon_server.src.user.repository;
 
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import javax.persistence.Id;
+import retoon.retoon_server.src.user.entity.Genre;
+import retoon.retoon_server.src.user.entity.UserProfile;
 
 @WebAppConfiguration
 @RunWith(SpringRunner.class)
@@ -70,4 +69,4 @@ public class UserProfileRepositoryTest {
     }
 
 }
-
+*/

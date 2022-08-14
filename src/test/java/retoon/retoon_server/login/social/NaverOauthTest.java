@@ -1,4 +1,4 @@
-package retoon.retoon_server.login.social;
+/*package retoon.retoon_server.login.social;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,3 +29,4 @@ public class NaverOauthTest {
     }
 
 }
+*/

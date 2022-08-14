@@ -1,8 +1,7 @@
-package retoon.retoon_server.login.social;
+package retoon.retoon_server.src.user.social;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import retoon.retoon_server.config.BaseResponse;
-import retoon.retoon_server.login.model.GetSocialUserRes;
+import retoon.retoon_server.src.user.information.GetSocialUserRes;
 
 public interface SocialOauth {
     /**
@@ -21,7 +20,7 @@ public interface SocialOauth {
 
     /**
      * API Server에서 받은 id token or access token을 활용해서 사용자 인증 정보 반환
-     * */
+     */
     GetSocialUserRes getUserInfo(String accessToken);
 
     /**

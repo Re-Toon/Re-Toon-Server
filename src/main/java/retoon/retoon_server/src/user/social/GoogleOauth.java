@@ -1,24 +1,22 @@
-package retoon.retoon_server.login.social;
+package retoon.retoon_server.src.user.social;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import retoon.retoon_server.login.model.GetGoogleUserRes;
-import retoon.retoon_server.login.model.GetSocialUserRes;
-import retoon.retoon_server.login.token.GoogleTokenRes;
+import retoon.retoon_server.src.user.information.GetGoogleUserRes;
+import retoon.retoon_server.src.user.information.GetSocialUserRes;
+import retoon.retoon_server.src.user.token.GoogleTokenRes;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import retoon.retoon_server.utils.JwtService;
 
 @Component
 @RequiredArgsConstructor
@@ -41,8 +39,6 @@ public class GoogleOauth implements SocialOauth {
     public String getScopeUrl(){
         return GOOGLE_LOGIN_SCOPE.replaceAll(",", "%20");
     }
-
-    public JwtService jwtService;
 
     @Override
     public String getOauthRedirectURL(){
