@@ -99,11 +99,11 @@ public class UserController {
      * return String
      * */
 
-    @PostMapping("")
-    public BaseResponse<String> createProfile(@RequestBody PostUserReq postUserReq){
+    @PostMapping("/{userIdx}")
+    public BaseResponse<String> createProfile(@PathVariable("userIdx") int userIdx, @RequestBody PostUserReq postUserReq){
         try{
             //UserProfile makeProfile = userService.createProfile(postUserReq); // 유저 프로필 생성
-            userService.createProfile(postUserReq); // 유저 프로필 생성
+            userService.createProfile(userIdx, postUserReq); // 유저 프로필 생성
             log.info("프로필 생성 성공");
             String result = "프로필 정보 생성을 완료했습니다.";
             return new BaseResponse<>(result);
@@ -140,11 +140,12 @@ public class UserController {
      * parameter userIdx
      * return String
      * */
+
     @PatchMapping("/{userIdx}/status")
-    public BaseResponse<String> deleteProfile(@PathVariable("userIdx") int userIdx){
+    public BaseResponse<String> deleteUser(@PathVariable("userIdx") int userIdx){
         try{
             log.info("회원 탈퇴 성공");
-            userService.deleteProfile(userIdx); // 회원 탈퇴 진행
+            userService.deleteUser(userIdx); // 회원 탈퇴 진행
             String result = "회원 탈퇴를 완료했습니다.";
             return new BaseResponse<>(result);
         }
