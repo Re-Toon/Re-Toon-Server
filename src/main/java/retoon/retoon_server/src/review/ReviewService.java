@@ -7,7 +7,7 @@ import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.review.entity.Review;
 import retoon.retoon_server.src.review.model.PostReviewReq;
 import retoon.retoon_server.src.review.repository.ReviewRepository;
-import retoon.retoon_server.src.user.repository.UserProfileRepository;
+import retoon.retoon_server.src.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-    private final UserProfileRepository userProfileRepository;
+    private final UserRepository userRepository;
 
     public void checkReview(int userIdx, PostReviewReq postReviewReq) throws BaseException {
         //userIdx 로 로그인된 대상인지 확인하는 validation 처리
@@ -30,7 +30,7 @@ public class ReviewService {
     public void createReview(int userIdx, PostReviewReq postReviewReq) throws BaseException {
         checkReview(userIdx, postReviewReq);
         Review review = Review.builder()
-                .user(userProfileRepository.getReferenceById(userIdx))
+                .user(userRepository.getReferenceById(userIdx))
                 .webtoonIdx(postReviewReq.getWebtoonIdx())
                 .reviewText(postReviewReq.getReviewText())
                 .reviewStarRate(postReviewReq.getReviewStarRate())

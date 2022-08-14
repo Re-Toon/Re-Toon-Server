@@ -7,7 +7,7 @@ import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.src.review.model.PostReviewReq;
 import retoon.retoon_server.src.review.repository.ReviewRepository;
-import retoon.retoon_server.src.user.repository.UserProfileRepository;
+import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.utils.JwtService;
 
 @RestController // JSON 형태 결과값을 반환해줌 (@ResponseBody가 필요없음)
@@ -17,7 +17,8 @@ import retoon.retoon_server.utils.JwtService;
 public class ReviewController {
 
     private final ReviewRepository reviewRepository;
-    private final UserProfileRepository userProfileRepository;
+
+    private final UserRepository userRepository;
     private final ReviewService reviewService;
 
     private final JwtService jwtService;
