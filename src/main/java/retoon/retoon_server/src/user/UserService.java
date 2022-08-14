@@ -36,8 +36,7 @@ public class UserService {
     private final NaverOauth naverOauth;
 
     private final HttpServletResponse response;
-    @Autowired
-    private final UserProfileRepository userProfileRepository;
+
     @Autowired
     private final UserRepository userRepository;
 
