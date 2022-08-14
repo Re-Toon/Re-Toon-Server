@@ -15,9 +15,6 @@ import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.PatchUserReq;
 import retoon.retoon_server.src.user.model.PostUserReq;
-import retoon.retoon_server.src.user.entity.Genre;
-import retoon.retoon_server.src.user.entity.UserProfile;
-import retoon.retoon_server.src.user.repository.UserProfileRepository;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
