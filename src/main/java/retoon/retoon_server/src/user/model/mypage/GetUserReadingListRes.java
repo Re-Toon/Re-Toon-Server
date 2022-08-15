@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.user.model;
+package retoon.retoon_server.src.user.model.mypage;
 
 
 import lombok.AllArgsConstructor;
