@@ -12,13 +12,13 @@ import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.information.PostSocialUserRes;
-import retoon.retoon_server.src.user.model.PatchUserReq;
-import retoon.retoon_server.src.user.model.PostJoinUserReq;
-import retoon.retoon_server.src.user.model.PostJoinUserRes;
-import retoon.retoon_server.src.user.model.PostUserReq;
+import retoon.retoon_server.src.user.model.*;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.utils.JwtService;
+
+import static retoon.retoon_server.config.BaseResponseStatus.*;
+import static retoon.retoon_server.utils.ValidationRegex.isRegexEmail;
 
 @RestController
 @CrossOrigin
@@ -100,14 +100,42 @@ public class UserController {
 
     /**
      * POST / 회원가입 API
-     * parameter email, password
-     * return String
+     * parameter postJoinReq
+     * return postLoginRes
      * */
     @PostMapping(value="/join")
     public BaseResponse<PostJoinUserRes> joinUser(@RequestBody PostJoinUserReq postJoinUserReq) {
         try{
             PostJoinUserRes joinUser = userService.joinUser(postJoinUserReq);
             return new BaseResponse<>(joinUser);
+        }
+        catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /**
+     * POST / 로그인 API
+     * parameter postLoginReq
+     * return postLoginRes
+     * */
+    @PostMapping(value = "/login")
+    public BaseResponse<PostLoginUserRes> loginUser(@RequestBody PostLoginUserReq postLoginUserReq){
+        try{
+            // 이메일을 입력하지 않은 경우
+            if(postLoginUserReq.getEmail() == null || postLoginUserReq.getEmail().equals("")){
+                return new BaseResponse<>(EMPTY_USER_EMAIL);
+            }
+            // 이메일 정규표현식이 아닌 경우
+            if(!isRegexEmail(postLoginUserReq.getEmail())){
+                return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+            }
+            // 비밀번호를 입력하지 않은 경우
+            if(postLoginUserReq.getPassword() == null || postLoginUserReq.getPassword().equals("")){
+                return new BaseResponse<>(EMPTY_USER_PASSWORD);
+            }
+            PostLoginUserRes postLoginUserRes = userService.loginUser(postLoginUserReq);
+            return new BaseResponse<>(postLoginUserRes);
         }
         catch(BaseException e){
             return new BaseResponse<>(e.getStatus());

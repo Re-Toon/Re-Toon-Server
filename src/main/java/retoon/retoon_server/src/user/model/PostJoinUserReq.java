@@ -15,9 +15,4 @@ public class PostJoinUserReq {
     String email; // 이메일
     String password; // 비밀번호
     String passwordCheck; // 비밀번호 확인
-
-    // 사용자 객체로 반환, 회원가입 시에 password 우선적으로 삽입
-    public User toUser(String password){
-        return new User(email, name, password);
-    }
 }

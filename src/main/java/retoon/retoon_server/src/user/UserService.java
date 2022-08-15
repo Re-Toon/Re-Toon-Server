@@ -2,22 +2,20 @@ package retoon.retoon_server.src.user;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.UserGenre;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
-import retoon.retoon_server.src.user.model.PostJoinUserReq;
-import retoon.retoon_server.src.user.model.PostJoinUserRes;
+import retoon.retoon_server.src.user.model.*;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.GoogleOauth;
 import retoon.retoon_server.src.user.social.KakaoOauth;
 import retoon.retoon_server.src.user.social.NaverOauth;
 import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.src.user.entity.User;
-import retoon.retoon_server.src.user.model.PatchUserReq;
-import retoon.retoon_server.src.user.model.PostUserReq;
+import retoon.retoon_server.utils.JwtService;
+import retoon.retoon_server.utils.SHA256;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -27,21 +25,16 @@ import java.util.Optional;
 import static retoon.retoon_server.utils.ValidationRegex.*;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Autowired 역할
 public class UserService {
 
     // 구글, 카카오, 네이버 oauth 객체 생성
-    @Autowired
     private final GoogleOauth googleOauth;
-    @Autowired
     private final KakaoOauth kakaoOauth;
-    @Autowired
     private final NaverOauth naverOauth;
-
     private final HttpServletResponse response;
-
-    @Autowired
     private final UserRepository userRepository;
+    private final JwtService jwtService;
 
     //enum type 인식
     public void request(SocialLoginType socialLoginType){
@@ -204,7 +197,20 @@ public class UserService {
         }
 
         // 모든 유효성 검증을 마친 경우
-        User user = postJoinUserReq.toUser(postJoinUserReq.getPassword());
+        User user = new User();
+        user.setEmail(postJoinUserReq.getEmail());
+        user.setName(postJoinUserReq.getName());
+        // 비밀번호 암호화
+        String encryptPwd;
+        try{
+            // 비밀번호 암호화
+            encryptPwd = new SHA256().encrypt(postJoinUserReq.getPassword());
+        }
+        catch(Exception e){
+            // 비밀번호 암호화 실패
+            throw new BaseException(BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR);
+        }
+        user.setPassword(encryptPwd); // 암호화된 비밀번호를 DB에 저장
 
         // DB 반영
         userRepository.save(user);
@@ -214,6 +220,36 @@ public class UserService {
 
         return new PostJoinUserRes(joinUser.getUserIdx(), joinUser.getName(), joinUser.getEmail());
     }
+
+    public PostLoginUserRes loginUser(PostLoginUserReq postLoginUserReq) throws BaseException {
+        // 이메일로 사용자 조회
+        if(!userRepository.existsByEmail(postLoginUserReq.getEmail())){
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS);
+        }
+        // 사용자가 존재하는 경우에 해당 객체를 반환
+        User user = userRepository.findByEmail(postLoginUserReq.getEmail());
+        String encryptPwd;
+        try{
+            // 비밀번호 암호화
+            encryptPwd = new SHA256().encrypt(postLoginUserReq.getPassword());
+        }
+        catch(Exception e){
+            // 비밀번호 암호화 실패
+            throw new BaseException(BaseResponseStatus.PASSWORD_ENCRYPTION_ERROR);
+        }
+
+        if(user.getPassword().equals(encryptPwd)){ // 암호화된 비밀번호가 DB에 저장된 비밀번호와 일치하는 경우 JWT 토큰 발급
+            int userIdx = user.getUserIdx();
+            String jwtToken = jwtService.createJwt(userIdx);
+            saveJwtToken(user, jwtToken); // JWT 토큰 저장
+            return new PostLoginUserRes(userIdx, jwtToken);
+        }
+        else{
+            throw new BaseException(BaseResponseStatus.FAILED_TO_LOGIN);
+        }
+
+    }
+
 
     public void createProfile(int userIdx, PostUserReq postUserReq) throws BaseException {
         // 유저 인덱스를 통한 객체 반환
@@ -252,7 +288,7 @@ public class UserService {
         }
         else{
             // 유저가 존재하지 않는 경우
-            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS);
         }
     }
 
@@ -287,7 +323,7 @@ public class UserService {
         }
         else{
             // 유저가 존재하지 않는 경우
-            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS);
         }
     }
 
@@ -303,7 +339,7 @@ public class UserService {
         }
         else{
             // 유저가 존재하지 않는 경우
-            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
+            throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS);
         }
     }
 
