@@ -62,5 +62,34 @@ public class ReviewController {
             return new BaseResponse(exception.getStatus());
         }
     }
+    /**
+     * 리뷰 좋아요
+     * [POST] /reviews/like
+     */
+    @PostMapping("/like")
+    public BaseResponse addReviewLike(@RequestParam Long reviewIdx) {
+        try{
+            //int userIdx = jwtService.getUserIdx();
+            reviewService.addReviewLike(1, reviewIdx);
+            return new BaseResponse("OK");
+        }catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+    /**
+     * 리뷰 좋아요 취소
+     * [POST] /reviews/unlike
+     */
+   /* @DeleteMapping("/unlike")
+    public BaseResponse deleteReviewLike(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
+        try {
+            int userIdx = jwtService.getUserIdx();
+            reviewService.deleteReviewLike(1, reviewIdx);
+            return new BaseResponse("OK");
+        } catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }*/
+
 
 }

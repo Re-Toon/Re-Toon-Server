@@ -6,8 +6,11 @@ import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.review.entity.Review;
+import retoon.retoon_server.src.review.entity.ReviewLike;
 import retoon.retoon_server.src.review.model.PostReviewReq;
+import retoon.retoon_server.src.review.repository.ReviewLikeRepository;
 import retoon.retoon_server.src.review.repository.ReviewRepository;
+import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
@@ -17,6 +20,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class ReviewService {
     private final ReviewRepository reviewRepository;
+    private final ReviewLikeRepository reviewLikeRepository;
     @Autowired
     private final UserRepository userRepository;
 
@@ -31,7 +35,7 @@ public class ReviewService {
 
     @Transactional
     public void createReview(int userIdx, PostReviewReq postReviewReq) throws BaseException {
-        checkReview(userIdx,postReviewReq);
+        checkReview(userIdx, postReviewReq);
         Review review = Review.builder()
                 .user(userRepository.getReferenceById(userIdx))
                 .webtoonIdx(postReviewReq.getWebtoonIdx())
@@ -47,7 +51,7 @@ public class ReviewService {
 
     @Transactional
     public void editReview(int userIdx, Long reviewIdx, PostReviewReq postReviewReq) throws BaseException {
-        checkReview(userIdx,postReviewReq);
+        checkReview(userIdx, postReviewReq);
         if (reviewRepository.existsByReviewIdx(reviewIdx) == false)
             throw new BaseException(BaseResponseStatus.INVALID_REVIEW_IDX);
         Review review = reviewRepository.getReferenceById(reviewIdx);
@@ -60,13 +64,30 @@ public class ReviewService {
 
     @Transactional
     public void deleteReview(int userIdx, Long reviewIdx) throws BaseException {
-        if (userRepository.existsById(userIdx) == false)
+        if (!userRepository.existsById(userIdx))
             throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
-        if (reviewRepository.existsByReviewIdx(reviewIdx) == false)
+        if (!reviewRepository.existsByReviewIdx(reviewIdx))
             throw new BaseException(BaseResponseStatus.INVALID_REVIEW_IDX);
         Review review = reviewRepository.getReferenceById(reviewIdx);
         if (review.getUser().getUserIdx() != userIdx)
             throw new BaseException(BaseResponseStatus.INVALID_REVIEW_USER);
         reviewRepository.deleteById(reviewIdx);
     }
+
+    @Transactional
+    public void addReviewLike(int userIdx, Long reviewIdx) throws BaseException {
+        //if (!userRepository.existsById(userIdx))
+          //  throw new BaseException(BaseResponseStatus.INVALID_USER_JWT);
+        if (!reviewRepository.existsByReviewIdx(reviewIdx))
+            throw new BaseException(BaseResponseStatus.INVALID_REVIEW_IDX);
+        Review review = reviewRepository.getReferenceById(reviewIdx);
+        User user = userRepository.getReferenceById(userIdx);
+        ReviewLike reviewLike = ReviewLike.builder()
+                .review(review)
+                .user(user)
+                .build();
+        reviewLikeRepository.save(reviewLike);
+    }
+
 }
+
