@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
+import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.UserGenre;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.repository.UserRepository;
@@ -15,10 +16,10 @@ import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.PatchUserReq;
 import retoon.retoon_server.src.user.model.PostUserReq;
-import retoon.retoon_server.utils.JwtService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -35,8 +36,6 @@ public class UserService {
 
     private final HttpServletResponse response;
 
-    @Autowired
-    private final JwtService jwtService;
     @Autowired
     private final UserRepository userRepository;
 
@@ -67,7 +66,7 @@ public class UserService {
         }
     }
 
-    public String requestAccessToken(SocialLoginType socialLoginType, String code) throws JsonProcessingException {
+    public String requestAccessToken(SocialLoginType socialLoginType, String code) {
         switch (socialLoginType){
             case GOOGLE:{
                 try {
@@ -166,10 +165,21 @@ public class UserService {
         User makeProfile;
 
         if(userProfile.isPresent()){
+            // 유저가 존재하는 경우
             makeProfile = userProfile.get();
+
+            // 닉네임을 입력하지 않은 경우
+            if(postUserReq.getNickname() == null || Objects.equals(postUserReq.getNickname(), "")){
+                throw new BaseException(BaseResponseStatus.EMPTY_USER_NICKNAME);
+            }
             makeProfile.setNickname(postUserReq.getNickname()); // 닉네임 설정
             makeProfile.setIntroduce(postUserReq.getIntroduce()); // 자기소개 설정
             makeProfile.setImgUrl(postUserReq.getImgUrl()); // 이미지 설정
+
+            // 선호하는 장르 리스트가 4개가 아닌 경우
+            if(postUserReq.getGenres().size() != 4){
+                throw new BaseException(BaseResponseStatus.INSUFFICIENT_USER_GENRE_LIST);
+            }
 
             // 반복적으로 장르 리스트를 삽입
             for(int i = 0; i < postUserReq.getGenres().size(); i++){
@@ -183,6 +193,10 @@ public class UserService {
             // DB 반영
             userRepository.flush();
         }
+        else{
+            // 유저가 존재하지 않는 경우
+            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
+        }
     }
 
     // 프로필 수정하는 함수
@@ -194,10 +208,17 @@ public class UserService {
         // 유저 정보가 존재하는 경우
         if(userProfile.isPresent()){
             newProfile = userProfile.get();
+
+            if(patchUserReq.getNickname() == null || Objects.equals(patchUserReq.getNickname(), "")){
+                throw new BaseException(BaseResponseStatus.EMPTY_USER_NICKNAME);
+            }
             newProfile.setNickname(patchUserReq.getNickname()); // 닉네임 수정
             newProfile.setIntroduce(patchUserReq.getIntroduce()); // 자기소개 수정
             newProfile.setImgUrl(patchUserReq.getImgUrl()); // 이미지 수정
 
+            if(patchUserReq.getGenres().size() != 4){
+                throw new BaseException(BaseResponseStatus.INSUFFICIENT_USER_GENRE_LIST);
+            }
             // 장르 리스트 수정
             for(int i = 0; i < patchUserReq.getGenres().size(); i++){
                 UserGenre genre = newProfile.getGenres().get(i); // 장르 객체 반환
@@ -206,6 +227,10 @@ public class UserService {
 
             userRepository.save(newProfile);
             userRepository.flush(); // DB 반영
+        }
+        else{
+            // 유저가 존재하지 않는 경우
+            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
         }
     }
 
@@ -218,6 +243,10 @@ public class UserService {
             getUser.setStatus("INACTIVE"); // 유저 정보 수정
             userRepository.save(getUser); // 저장
             userRepository.flush(); // DB 반영
+        }
+        else{
+            // 유저가 존재하지 않는 경우
+            throw new BaseException(BaseResponseStatus.INVALID_USER_IDX);
         }
     }
 
