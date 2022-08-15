@@ -32,6 +32,21 @@ public enum BaseResponseStatus {
     INSUFFICIENT_USER_GENRE_LIST(false, 2102, "선호하는 장르 4가지를 선택해주세요."),
     NOT_LOGIN_USER(false, 2103, "로그인 되지 않은 사용자입니다."),
 
+    // [POST] /users
+    EMPTY_USER_NAME(false, 2104, "사용자 이름을 입력해주세요."),
+
+    // [POST] /users /email
+    EMPTY_USER_EMAIL(false, 2105, "이메일을 입력해주세요."),
+    POST_USERS_EXISTS_EMAIL(false, 2106, "중복된 이메일이 존재합니다."),
+    POST_USERS_INVALID_EMAIL(false, 2107, "이메일 형식을 확인해주세요."),
+
+    // [POST] /users /password
+    EMPTY_USER_PASSWORD(false, 2108, "비밀번호를 입력해주세요."),
+    EMPTY_USER_CHECK_PASSWORD(false, 2109, "비밀번호를 한번 더 입력해주세요."),
+    NOT_EQUAL_PASSWORD(false, 2110, "비밀번호가 일치하지 않습니다."),
+    //POST_USERS_INVALID_PASSWORD(false, 2111, "비밀번호는 8~16자의 영문 대/소문자, 숫자, 특수문자를 사용하세요."),
+    POST_USERS_INVALID_PASSWORD(false, 2111, "비밀번호는 적어도 1개 이상의 영문, 숫자, 특수문자를 사용하여 8~16자를 입력해주세요."),
+
     /**
      * 3000 : Response 오류
      */
