@@ -8,6 +8,8 @@ import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.UserGenre;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
+import retoon.retoon_server.src.user.model.PostJoinUserReq;
+import retoon.retoon_server.src.user.model.PostJoinUserRes;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.GoogleOauth;
 import retoon.retoon_server.src.user.social.KakaoOauth;
@@ -21,6 +23,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
+
+import static retoon.retoon_server.utils.ValidationRegex.*;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +160,59 @@ public class UserService {
         user.setJwtToken(jwtToken); // 유저 객체의 jwt token 수정
         userRepository.save(user);
         userRepository.flush(); // DB 반영
+    }
+
+    public PostJoinUserRes joinUser(PostJoinUserReq postJoinUserReq) throws BaseException {
+        // 사용자 이름을 입력하지 않은 경우
+        if(postJoinUserReq.getName() == null || postJoinUserReq.getName().equals("")){
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_NAME);
+        }
+
+        // 사용자 이메일을 입력하지 않은 경우
+        if (postJoinUserReq.getEmail() == null || postJoinUserReq.getEmail().equals("")) {
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_EMAIL);
+        }
+
+        // 기존에 존재하는 이메일인 경우
+        if(userRepository.existsByEmail(postJoinUserReq.getEmail())){
+            throw new BaseException(BaseResponseStatus.POST_USERS_EXISTS_EMAIL);
+        }
+
+        // 이메일 정규표현식이 아닌 경우
+        if(!isRegexEmail(postJoinUserReq.getEmail())){
+            throw new BaseException(BaseResponseStatus.POST_USERS_INVALID_EMAIL);
+        }
+
+        // 사용자 비밀번호를 입력하지 않은 경우
+        if(postJoinUserReq.getPassword() == null || postJoinUserReq.getPassword().equals("")){
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_PASSWORD);
+        }
+
+        // 비밀번호가 영문, 숫자, 특수문자를 섞어서 넣지 않은 경우
+        if(!isRegexPassword(postJoinUserReq.getPassword())){
+            throw new BaseException(BaseResponseStatus.POST_USERS_INVALID_PASSWORD);
+        }
+
+        // 사용자 비밀번호 확인을 한번 더 입력하지 않은 경우
+        if(postJoinUserReq.getPasswordCheck() == null || postJoinUserReq.getPasswordCheck().equals("")){
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_CHECK_PASSWORD);
+        }
+
+        // 사용자 비밀번호와 비밀번호 확인이 일치하지 않는 경우
+        if(!postJoinUserReq.getPasswordCheck().equals(postJoinUserReq.getPassword())){
+            throw new BaseException(BaseResponseStatus.NOT_EQUAL_PASSWORD);
+        }
+
+        // 모든 유효성 검증을 마친 경우
+        User user = postJoinUserReq.toUser(postJoinUserReq.getPassword());
+
+        // DB 반영
+        userRepository.save(user);
+        userRepository.flush();
+
+        User joinUser = userRepository.findByEmail(postJoinUserReq.getEmail());
+
+        return new PostJoinUserRes(joinUser.getUserIdx(), joinUser.getName(), joinUser.getEmail());
     }
 
     public void createProfile(int userIdx, PostUserReq postUserReq) throws BaseException {

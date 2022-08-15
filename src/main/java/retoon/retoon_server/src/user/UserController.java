@@ -8,10 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
+import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.information.PostSocialUserRes;
 import retoon.retoon_server.src.user.model.PatchUserReq;
+import retoon.retoon_server.src.user.model.PostJoinUserReq;
+import retoon.retoon_server.src.user.model.PostJoinUserRes;
 import retoon.retoon_server.src.user.model.PostUserReq;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.SocialLoginType;
@@ -31,8 +34,8 @@ public class UserController {
     private final JwtService jwtService;
 
     /**
-     * 사용자로부터 SNS 로그인 요청을 Social Login Type 으로 받아 처리
-     * parameter socialLoginType (GOOGLE, NAVER, KAKAO)
+     * GET / Social Login 페이지 이동 API
+     * parameter Social Login Type(GOOGLE, NAVER, KAKAO)
      * */
 
     @GetMapping(value = "login/{socialLoginType}")
@@ -43,11 +46,10 @@ public class UserController {
     }
 
     /**
+     * GET / 로그인 및 회원가입 API
+     * 자동적으로 redirect url 이동
      * Social Login API Server 요청에 의한 callback 처리
      * parameter socialLoginType (GOOGLE, NAVER, KAKAO)
-     * return SNS 로그인 요청 결과로 받은 JSON 형태의 문자열, 사용자 정보
-     * access_token, refresh_token + 사용자 정보
-     * 사용자 정보를 얻어서 DB에 저장
      * */
     @GetMapping(value = "login/{socialLoginType}/callback")
     public BaseResponse<PostSocialUserRes> callback(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
@@ -97,6 +99,23 @@ public class UserController {
     }
 
     /**
+     * POST / 회원가입 API
+     * parameter email, password
+     * return String
+     * */
+    @PostMapping(value="/join")
+    public BaseResponse<PostJoinUserRes> joinUser(@RequestBody PostJoinUserReq postJoinUserReq) {
+        try{
+            PostJoinUserRes joinUser = userService.joinUser(postJoinUserReq);
+            return new BaseResponse<>(joinUser);
+        }
+        catch(BaseException e){
+            return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+
+    /**
      * GET / 로그인 상태 확인 API
      * parameter userIdx
      * return String
@@ -107,9 +126,9 @@ public class UserController {
             int userIdxByJwt = jwtService.getUserIdx();
             String result;
             if(userIdx != userIdxByJwt){
-                result = "로그인 되지 않은 유저입니다.";
+                throw new BaseException(BaseResponseStatus.NOT_LOGIN_USER);
             }
-            else{ result = "로그인된 유저입니다."; }
+            result = "로그인된 사용자입니다.";
             return new BaseResponse<>(result);
         }
         catch (BaseException e) {
@@ -121,21 +140,18 @@ public class UserController {
 
     /**
      * POST / 프로필 생성 API
-     * parameter userIdx, userProfile 생성하고자 하는 유저의 정보를 담은 객체
+     * parameter userIdx, postUserReq
      * return String
      * */
 
     @PostMapping("/{userIdx}")
     public BaseResponse<String> createProfile(@PathVariable("userIdx") int userIdx, @RequestBody PostUserReq postUserReq){
         try{
-            //UserProfile makeProfile = userService.createProfile(postUserReq); // 유저 프로필 생성
             userService.createProfile(userIdx, postUserReq); // 유저 프로필 생성
-            log.info("프로필 생성 성공");
             String result = "프로필 정보 생성을 완료했습니다.";
             return new BaseResponse<>(result);
         }
         catch (BaseException e){
-            log.info("프로필 생성 실패");
             return new BaseResponse<>((e.getStatus()));
         }
     }
@@ -143,7 +159,7 @@ public class UserController {
 
     /**
      * PATCH / 프로필 수정 API
-     * parameter userIdx, patchUserReq 수정 가능한 유저의 정보를 담은 객체
+     * parameter userIdx, patchUserReq
      * return String
      * */
 
@@ -151,12 +167,10 @@ public class UserController {
     public BaseResponse<String> modifyProfile(@PathVariable("userIdx") int userIdx, @RequestBody PatchUserReq patchUserReq){
         try{
             userService.modifyProfile(userIdx, patchUserReq); // 유저 프로필 수정
-            log.info("프로필 수정 성공");
             String result = "프로필 정보 수정을 완료했습니다.";
             return new BaseResponse<>(result);
         }
         catch (BaseException e){
-            log.info("프로필 수정 실패");
             return new BaseResponse<>((e.getStatus()));
         }
     }
@@ -170,13 +184,11 @@ public class UserController {
     @PatchMapping("/{userIdx}/status")
     public BaseResponse<String> deleteUser(@PathVariable("userIdx") int userIdx){
         try{
-            log.info("회원 탈퇴 성공");
             userService.deleteUser(userIdx); // 회원 탈퇴 진행
             String result = "회원 탈퇴를 완료했습니다.";
             return new BaseResponse<>(result);
         }
         catch(BaseException e){
-            log.info("회원 탈퇴 실패");
             return new BaseResponse<>(e.getStatus());
         }
     }

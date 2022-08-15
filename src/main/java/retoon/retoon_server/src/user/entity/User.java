@@ -26,7 +26,7 @@ public class User {
     @Column(length = 45, nullable = false)
     private String email; // 유저 이메일
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+   @Column(columnDefinition = "TEXT", nullable = false)
     private String jwtToken; // 유저 토큰
 
     @Column(length = 45)

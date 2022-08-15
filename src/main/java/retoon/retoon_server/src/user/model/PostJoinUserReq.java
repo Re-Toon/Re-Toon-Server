@@ -6,8 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import retoon.retoon_server.src.user.entity.User;
 
-import java.util.Date;
-
 @Getter
 @Setter
 @AllArgsConstructor
