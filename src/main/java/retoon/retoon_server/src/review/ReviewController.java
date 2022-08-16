@@ -62,5 +62,79 @@ public class ReviewController {
             return new BaseResponse(exception.getStatus());
         }
     }
+    /**
+     * 리뷰 좋아요
+     * [POST] /reviews/like
+     */
+    @PostMapping("/like")
+    public BaseResponse addReviewLike(@RequestParam Long reviewIdx) {
+        try{
+            int userIdx = jwtService.getUserIdx();
+            reviewService.addReviewLike(userIdx, reviewIdx);
+            return new BaseResponse("OK");
+        }catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+    /**
+     * 리뷰 좋아요 취소
+     * [DELETE] /reviews/like
+     */
+    @DeleteMapping("/like")
+    public BaseResponse deleteReviewLike(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
+        try {
+            //int userIdx = jwtService.getUserIdx();
+            reviewService.deleteReviewLike(1, reviewIdx);
+            return new BaseResponse("OK");
+        } catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+
+    /**
+     * 리뷰 싫어요
+     * [POST] /reviews/unlike
+     */
+    @PostMapping("/unlike")
+    public BaseResponse addReviewUnlike(@RequestParam Long reviewIdx) {
+        try{
+            //int userIdx = jwtService.getUserIdx();
+            reviewService.addReviewUnlike(1, reviewIdx);
+            return new BaseResponse("OK");
+        }catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+
+    /**
+     * 리뷰 싫어요 취소
+     * [DELETE] /reviews/like
+     */
+    @DeleteMapping("/unlike")
+    public BaseResponse deleteReviewUnlike(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
+        try {
+            //int userIdx = jwtService.getUserIdx();
+            reviewService.deleteReviewUnlike(1, reviewIdx);
+            return new BaseResponse("OK");
+        } catch (BaseException exception) {
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+
+    /**
+     * 리뷰 게시물 조회
+     * [GET] /reviews
+     */
+    @GetMapping
+    public BaseResponse getReview(@RequestParam Long reviewIdx) {
+        try {
+            reviewService.getReview(reviewIdx);
+            return new BaseResponse("OK");
+        }
+        catch (BaseException exception){
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+
 
 }

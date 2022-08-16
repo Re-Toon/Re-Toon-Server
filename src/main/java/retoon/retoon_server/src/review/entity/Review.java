@@ -4,6 +4,7 @@ import lombok.*;
 import retoon.retoon_server.src.user.entity.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -39,4 +40,7 @@ public class Review {
     @NonNull
     @Column(columnDefinition = "boolean default false")
     private boolean isSpoiler;
+
+    @OneToMany(mappedBy = "review", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<ReviewLike> reviewLikes;
 }
