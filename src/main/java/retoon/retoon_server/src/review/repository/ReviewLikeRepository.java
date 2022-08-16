@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface ReviewLikeRepository extends JpaRepository<ReviewLike, Long> {
-
+    @Query(value = "select r from ReviewLike r where r.review.reviewIdx = :reviewIdx and r.user.userIdx = :userIdx")
+    Optional<ReviewLike> findByReviewIdxUserIdx(int userIdx, Long reviewIdx);
 }

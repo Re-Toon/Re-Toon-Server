@@ -25,6 +25,8 @@ public enum BaseResponseStatus {
     INVALID_REVIEW_USER(false, 2007, "리뷰를 작성한 유저가 아닙니다."),
     INVALID_REVIEW_LIKE(false, 2008, "해당 리뷰의 좋아요가 존재하지 않습니다."),
     INVALID_REVIEW_LIKE_USER(false, 2009, "리뷰 좋아요를 누른 유저가 아닙니다."),
+    EMPTY_REVIEW_LIKE(false, 2010, "리뷰 좋아요가 존재하지 않습니다."),
+    EMPTY_REVIEW_UNLIKE(false, 2011, "리뷰 싫어요가 존재하지 않습니다."),
 
     FAILED_ON_SERVER(false, 100, "예기치 못한 에러가 발생했습니다.")
     ;
