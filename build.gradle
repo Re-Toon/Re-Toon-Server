@@ -55,6 +55,8 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     // Json Object 의존성 추가
     implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
+    // Native Query 사용을 위한 의존성 추가
+    implementation group: 'ch.simas.qlrm', name: 'qlrm', version: '1.7.1'
 }
 
 tasks.named('test') {
