@@ -1,7 +1,6 @@
 package retoon.retoon_server.src.user;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +12,14 @@ import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.information.PostSocialUserRes;
 import retoon.retoon_server.src.user.model.*;
+import retoon.retoon_server.src.user.model.mypage.GetUserFollowRes;
+import retoon.retoon_server.src.user.model.mypage.GetUserProfileRes;
+import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.SocialLoginType;
 import retoon.retoon_server.utils.JwtService;
+
+import java.util.List;
 
 import static retoon.retoon_server.config.BaseResponseStatus.*;
 import static retoon.retoon_server.utils.ValidationRegex.isRegexEmail;
@@ -32,6 +36,8 @@ public class UserController {
     private final UserRepository userRepository;
     @Autowired
     private final JwtService jwtService;
+    @Autowired
+    private final FollowRepository followRepository;
 
     /**
      * GET / Social Login 페이지 이동 API
@@ -53,7 +59,7 @@ public class UserController {
      * */
     @GetMapping(value = "login/{socialLoginType}/callback")
     public BaseResponse<PostSocialUserRes> callback(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
-                                                    @RequestParam(name = "code") String code) throws JsonProcessingException {
+                                                    @RequestParam(name = "code") String code) {
         //인가 코드 획득
         log.info(">> SNS 로그인 서버에서 받은 code :: {}", code);
 
@@ -148,7 +154,7 @@ public class UserController {
      * parameter userIdx
      * return String
      */
-    @GetMapping("/{userIdx}")
+    @GetMapping("/login/{userIdx}")
     public BaseResponse<String> verifyUser(@PathVariable("userIdx") int userIdx) {
         try{
             int userIdxByJwt = jwtService.getUserIdx();
@@ -172,7 +178,7 @@ public class UserController {
      * return String
      * */
 
-    @PostMapping("/{userIdx}")
+    @PostMapping("/profile/{userIdx}")
     public BaseResponse<String> createProfile(@PathVariable("userIdx") int userIdx, @RequestBody PostUserReq postUserReq){
         try{
             userService.createProfile(userIdx, postUserReq); // 유저 프로필 생성
@@ -191,7 +197,7 @@ public class UserController {
      * return String
      * */
 
-    @PatchMapping("/{userIdx}")
+    @PatchMapping("/profile/{userIdx}")
     public BaseResponse<String> modifyProfile(@PathVariable("userIdx") int userIdx, @RequestBody PatchUserReq patchUserReq){
         try{
             userService.modifyProfile(userIdx, patchUserReq); // 유저 프로필 수정
@@ -220,4 +226,67 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+
+    /**
+     * POST / 팔로우 API
+     * parameter userIdx(팔로우 당하는 유저 인덱스)
+     * return 새로 생성된 팔로우 객체
+     * 팔로우 정보 저장 후  follow 객체 반환
+     * */
+    @PostMapping("/follow/{fromUserIdx}/{toUserIdx}")
+    public BaseResponse<PostFollowRes> followUser(@PathVariable("fromUserIdx") int fromUserIdx, @PathVariable("toUserIdx") int toUserIdx) throws BaseException {
+        User follower = userRepository.findByUserIdx(fromUserIdx);
+        if(follower == null) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        User followee = userRepository.findByUserIdx(toUserIdx);
+        if(followee == null) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        PostFollowRes follow = userService.followUser(fromUserIdx, toUserIdx); // 팔로우 정보 반환
+        return new BaseResponse<>(follow); // 팔로우 정보 전달
+    }
+
+
+    /**
+     * DELETE / 언팔로우 API
+     * parameter toUserId 언팔로우 당하는 유저의 인덱스
+     * fromUserId를 가진 유저가 toUserId를 가진 유저를 팔로우하는 정보를 삭제
+     * */
+    @DeleteMapping("/follow/{fromUserIdx}/{toUserIdx}")
+    public BaseResponse<String> unFollowUser(@PathVariable("fromUserIdx") int fromUserIdx, @PathVariable("toUserIdx") int toUserIdx) throws BaseException {
+        int unFollowIdx = userService.getFollowIdxByFromToUserIdx(fromUserIdx, toUserIdx); // 언팔로우할 정보 반환
+        if(unFollowIdx == -1){ return new BaseResponse<>(BaseResponseStatus.NOT_EXISTS_FOLLOW_INFO);} // 정보가 없는 경우에 팔로우 실패
+        followRepository.deleteById(unFollowIdx); // 팔로우한 정보 삭제
+        String result = "팔로우 비활성화 되었습니다.";
+        return new BaseResponse<>(result);
+    }
+
+    /**
+     * GET / 마이페이지 프로필 조회 API
+     * parameter userIdx, login email 현재 마이페이지 유저의 인덱스, 로그인한 유저 이메일
+     * return 마이페이지 내 프로필 부분에 닉네임, 자기소개, 이미지, 팔로잉 수, 팔로워 수 반환
+     * */
+    @GetMapping("profile/{userIdx}")
+    public BaseResponse<GetUserProfileRes> myPage(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+        GetUserProfileRes getUserProfileRes = userService.getProfile(userIdx, loginEmail);
+        return new BaseResponse<>(getUserProfileRes);
+    }
+
+    /**
+     * GET / 마이페이지 리뷰어 팔로워 목록 조회
+     * parameter userIdx, login email 현재 마이페이지 유저의 인덱스, 로그인한 유저 이메일
+     * */
+    @GetMapping("/follow/{userIdx}/follower")
+    public BaseResponse<List<GetUserFollowRes>> getFollower(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+        return new BaseResponse<>(userService.getFollowerListByUserIdx(userIdx, loginEmail));
+    }
+
+    /**
+     * GET / 마이페이지 리뷰어 팔로잉 목록 조회
+     * parameter userIdx, login email 현재 마이페이지 유저의 인덱스, 로그인한 유저 이메일
+     * */
+    @GetMapping("/follow/{userIdx}/following")
+    public BaseResponse<List<GetUserFollowRes>> getFollowing(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+        return new BaseResponse<>(userService.getFollowingListByUserIdx(userIdx, loginEmail));
+    }
+
 }
