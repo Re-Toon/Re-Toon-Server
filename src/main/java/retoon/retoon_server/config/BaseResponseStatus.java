@@ -53,6 +53,14 @@ public enum BaseResponseStatus {
 
     // [POST] /users /login
     FAILED_TO_LOGIN(false, 2113, "로그인에 실패했습니다."),
+
+    // [POST] /users /follow
+    NOT_EXISTS_FOLLOW_INFO(false, 2114, "팔로우 정보가 존재하지 않습니다."),
+    EXISTS_FOLLOW_INFO(false, 2116, "팔로우 정보가 이미 존재합니다."),
+
+    // [POST] /users /profile
+    POST_USERS_EXISTS_NICKNAME(false, 2115, "중복된 닉네임이 존재합니다."),
+
     /**
      * 3000 : Response 오류
      */
