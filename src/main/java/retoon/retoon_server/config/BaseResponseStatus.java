@@ -27,6 +27,11 @@ public enum BaseResponseStatus {
     INVALID_REVIEW_LIKE_USER(false, 2009, "리뷰 좋아요를 누른 유저가 아닙니다."),
     EMPTY_REVIEW_LIKE(false, 2010, "리뷰 좋아요가 존재하지 않습니다."),
     EMPTY_REVIEW_UNLIKE(false, 2011, "리뷰 싫어요가 존재하지 않습니다."),
+    DUPLICATE_RESOURCE(false, 2012, "데이터가 이미 존재합니다"),
+    EMPTY_COMMENT_TEXT(false, 2013, "댓글을 입력해주세요."),
+    EMPTY_COMMENT_IDX(false, 2014, "존재하지 않는 댓글입니다."),
+    INVALID_COMMENT_USER(false, 2015, "댓글을 쓴 유저가 아닙니다."),
+
 
     FAILED_ON_SERVER(false, 100, "예기치 못한 에러가 발생했습니다."),
 

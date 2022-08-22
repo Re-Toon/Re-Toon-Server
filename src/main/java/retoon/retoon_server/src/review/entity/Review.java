@@ -1,5 +1,6 @@
 package retoon.retoon_server.src.review.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import retoon.retoon_server.src.user.entity.User;
 import javax.persistence.*;
@@ -43,4 +44,9 @@ public class Review {
 
     @OneToMany(mappedBy = "review", cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<ReviewLike> reviewLikes;
+    @OneToMany(mappedBy = "review", cascade = {CascadeType.ALL}, orphanRemoval = true)
+    private List<ReviewUnlike> reviewUnlikes;
+
+    @OneToMany(mappedBy ="review", cascade = CascadeType.REMOVE)
+    private List<Comment> comments;
 }
