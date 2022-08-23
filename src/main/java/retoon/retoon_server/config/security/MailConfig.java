@@ -1,4 +1,4 @@
-package retoon.retoon_server.config;
+package retoon.retoon_server.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
