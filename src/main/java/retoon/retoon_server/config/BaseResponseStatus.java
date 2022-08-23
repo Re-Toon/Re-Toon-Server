@@ -67,6 +67,8 @@ public enum BaseResponseStatus {
     //Common
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
 
+    NOT_VALID_REFRESH_TOKEN(false, 3100, "유효하지 않은 토큰입니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
