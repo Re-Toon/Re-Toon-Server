@@ -174,6 +174,7 @@ public class ReviewService {
         }
         GetReviewRes res = new GetReviewRes(review);
         res.setComments(commentRes);
+        res.setCommentCnt(commentRes.size());
         return res;
     }
 
