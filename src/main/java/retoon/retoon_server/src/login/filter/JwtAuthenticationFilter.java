@@ -3,7 +3,7 @@ package retoon.retoon_server.src.login.filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import retoon.retoon_server.src.login.token.JwtTokenProvider;
+import retoon.retoon_server.src.login.jwt.JwtTokenProvider;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;

@@ -1,8 +1,7 @@
-package retoon.retoon_server.src.login.token;
+package retoon.retoon_server.src.login.jwt;
 
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 import retoon.retoon_server.config.secret.Secret;
 
 import javax.annotation.PostConstruct;
-import javax.security.auth.message.config.AuthConfig;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Base64;
 import java.util.Date;
