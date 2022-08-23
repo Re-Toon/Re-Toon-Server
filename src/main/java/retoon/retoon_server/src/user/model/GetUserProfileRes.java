@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.user.model.mypage;
+package retoon.retoon_server.src.user.model;
 
 import lombok.*;
 
