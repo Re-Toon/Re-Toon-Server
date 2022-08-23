@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TokenResponseDto {
-    private String accessToken;
-    private String refreshToken;
+public class SocialProfileDto {
+    private String name; // 사용자 이름
+    private String email; // 사용자 이메일
 }
