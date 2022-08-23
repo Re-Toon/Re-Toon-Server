@@ -1,15 +1,20 @@
 package retoon.retoon_server.src.login.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberRegisterResponseDto {
-    long id;
-    String email;
+    private long id;
+    private String email;
+    private String authToken;
+
+    @Builder
+    public MemberRegisterResponseDto(Long id, String email, String authToken) {
+        this.id = id;
+        this.email = email;
+        this.authToken = authToken;
+    }
 }

@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import retoon.retoon_server.src.login.filter.JwtAuthenticationFilter;
 import retoon.retoon_server.src.login.handler.CustomAccessDeniedHandler;
 import retoon.retoon_server.src.login.handler.CustomAuthenticationEntryPoint;
-import retoon.retoon_server.src.login.token.JwtTokenProvider;
+import retoon.retoon_server.src.login.jwt.JwtTokenProvider;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // jwt로 인증하므로 세션 미사용
                 .and()
                 .authorizeRequests()
-                .antMatchers("/sign/**").permitAll()
+                .antMatchers("/sign/**").permitAll() // 인증이 필요하지 않은 부분 설정
                 .antMatchers("/social/**").permitAll()
                 .antMatchers("/exception/**").permitAll()
                 .anyRequest().authenticated()

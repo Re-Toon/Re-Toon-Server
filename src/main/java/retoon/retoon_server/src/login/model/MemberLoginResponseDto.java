@@ -10,7 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberLoginResponseDto {
-    long id;
-    String token;
-    String refreshToken;
+    private long id;
+    private String token;
+    private String refreshToken;
 }

@@ -1,25 +1,31 @@
 package retoon.retoon_server.src.login.controller;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.src.login.model.*;
 import retoon.retoon_server.src.login.service.SignService;
+import retoon.retoon_server.src.login.service.SocialService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/sign")
 public class SignController {
     private final SignService signService;
+    private final SocialService socialService;
 
     @PostMapping("/register")
-    public BaseResponse<MemberRegisterResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) throws BaseException {
+    public BaseResponse<MemberRegisterResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) throws Exception {
         MemberRegisterResponseDto responseDto = signService.registerMember(requestDto);
         return new BaseResponse<>(responseDto);
+    }
+
+    @GetMapping("/confirm-email")
+    public BaseResponse<String> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) throws BaseException {
+        signService.confirmEmail(requestDto);
+        return new BaseResponse<>("인증이 완료되었습니다.");
     }
 
     @PostMapping("/login")
@@ -33,4 +39,18 @@ public class SignController {
         TokenResponseDto responseDto = signService.reIssue(tokenRequestDto);
         return new BaseResponse<>(responseDto);
     }
+
+    @GetMapping(value = "/login/{provider}")
+    public void socialLoginType(@PathVariable(name = "provider")
+                                String provider) {
+        socialService.request(provider);
+    }
+
+    @GetMapping(value = "/login/{provider}/callback")
+    public BaseResponse<MemberLoginResponseDto> callback(@PathVariable(name = "provider") String provider,
+                                                         @RequestParam(name = "code") String code) {
+        MemberLoginResponseDto responseDto = signService.loginMemberByProvider(code, provider);
+        return new BaseResponse<>(responseDto);
+    }
+
 }
