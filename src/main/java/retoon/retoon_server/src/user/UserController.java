@@ -3,7 +3,6 @@ package retoon.retoon_server.src.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
@@ -12,8 +11,8 @@ import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.information.PostSocialUserRes;
 import retoon.retoon_server.src.user.model.*;
-import retoon.retoon_server.src.user.model.mypage.GetUserFollowRes;
-import retoon.retoon_server.src.user.model.mypage.GetUserProfileRes;
+import retoon.retoon_server.src.user.model.GetUserFollowRes;
+import retoon.retoon_server.src.user.model.GetUserProfileRes;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.SocialLoginType;
@@ -30,24 +29,20 @@ import static retoon.retoon_server.utils.ValidationRegex.isRegexEmail;
 @RequestMapping(value = "/users")
 @Slf4j
 public class UserController {
-    @Autowired
     private final UserService userService;
-    @Autowired
     private final UserRepository userRepository;
-    @Autowired
     private final JwtService jwtService;
-    @Autowired
     private final FollowRepository followRepository;
+    private final MailService mailService;
 
     /**
      * GET / Social Login 페이지 이동 API
      * parameter Social Login Type(GOOGLE, NAVER, KAKAO)
      * */
 
-    @GetMapping(value = "login/{socialLoginType}")
+    @GetMapping(value = "/login/{socialLoginType}")
     public void socialLoginType(@PathVariable(name = "socialLoginType")
                                 SocialLoginType socialLoginType) {
-        log.info(">> 사용자로부터 SNS 로그인 요청을 받음 :: {} Social Login", socialLoginType);
         userService.request(socialLoginType);
     }
 
@@ -57,16 +52,14 @@ public class UserController {
      * Social Login API Server 요청에 의한 callback 처리
      * parameter socialLoginType (GOOGLE, NAVER, KAKAO)
      * */
-    @GetMapping(value = "login/{socialLoginType}/callback")
+    @GetMapping(value = "/login/{socialLoginType}/callback")
     public BaseResponse<PostSocialUserRes> callback(@PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
                                                     @RequestParam(name = "code") String code) {
         //인가 코드 획득
-        log.info(">> SNS 로그인 서버에서 받은 code :: {}", code);
 
         //엑세스 토큰 획득
         String accessToken;
         accessToken = userService.requestAccessToken(socialLoginType, code);
-        log.info(">> SNS 로그인 서버에서 받은 access token :: {}", accessToken);
 
         //사용자 정보 획득
         GetSocialUserRes socialUserRes;
@@ -74,18 +67,16 @@ public class UserController {
 
         //이메일 획득
         String email = socialUserRes.getEmail();
-        log.info(">> SNS 로그인 서버에서 받은 사용자 이메일 :: {}", email);
 
-        log.info(">> 유저 정보가 존재하는지 확인 :: {}", userService.isJoinedUser(email));
         //유저 정보가 존재하지 않으면 엑세스 토큰을 담아 회원가입
         if(!userService.isJoinedUser(email)){
             userService.SignUp(socialUserRes, accessToken); //DB에 정보 저장
         }
         //가입된 유저는 유저 정보가 담긴 JWT 토큰 발급
         User user = userRepository.findByEmail(email);
-        log.info(">> 유저 이메일에 해당하는 유저 인덱스를 반환 :: {}", user.getUserIdx());
+
+        //유저 이메일에 해당하는 유저 인덱스를 반환
         String jwtToken = jwtService.createJwt(user.getUserIdx());
-        log.info(">> SNS 로그인 서버에서 받은 사용자 jwt :: {}", jwtToken);
 
         //변경된 JWT 토큰 반영하는 부분
         userService.saveJwtToken(user, jwtToken);
@@ -117,6 +108,30 @@ public class UserController {
         }
         catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
+        }
+    }
+
+    /** POST / 본인 인증 메일 전송 API */
+    @PostMapping("/join/verify")
+    public BaseResponse<String> sendEmail(@RequestBody PostEmailConfirmReq postEmailConfirmReq) {
+        String email = postEmailConfirmReq.getEmail();
+        try{
+            String code = mailService.sendCertification(email); // 인증 메일 보내기
+            return new BaseResponse<>(code); // 인증코드를 화면에 출력
+        }
+        catch(BaseException baseException){
+            return new BaseResponse<>(baseException.getStatus());
+        }
+    }
+
+    /** POST / 인증 번호 확인 API */
+    @PostMapping("join/confirm")
+    public BaseResponse<Boolean> confirmEmail(@RequestParam String code){
+        if(MailService.verifyCode.equals(code)){
+            return new BaseResponse<>(true);
+        }
+        else{
+            return new BaseResponse<>(false);
         }
     }
 
@@ -154,6 +169,7 @@ public class UserController {
      * parameter userIdx
      * return String
      */
+    /*
     @GetMapping("/login/{userIdx}")
     public BaseResponse<String> verifyUser(@PathVariable("userIdx") int userIdx) {
         try{
@@ -169,6 +185,7 @@ public class UserController {
             return new BaseResponse<>(e.getStatus());
         }
     }
+    */
 
 
 

@@ -10,8 +10,8 @@ import retoon.retoon_server.src.user.entity.Follow;
 import retoon.retoon_server.src.user.entity.UserGenre;
 import retoon.retoon_server.src.user.information.GetSocialUserRes;
 import retoon.retoon_server.src.user.model.*;
-import retoon.retoon_server.src.user.model.mypage.GetUserFollowRes;
-import retoon.retoon_server.src.user.model.mypage.GetUserProfileRes;
+import retoon.retoon_server.src.user.model.GetUserFollowRes;
+import retoon.retoon_server.src.user.model.GetUserProfileRes;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.social.GoogleOauth;
@@ -46,7 +46,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final FollowRepository followRepository;
-
     @PersistenceContext
     private EntityManager entityManager; // entity 관리, 스프링에서 주입받기 위해 작성
 
@@ -242,6 +241,7 @@ public class UserService {
 
         return new PostJoinUserRes(joinUser.getUserIdx(), joinUser.getName(), joinUser.getEmail());
     }
+
 
     /** 이메일 일반 로그인 */
     public PostLoginUserRes loginUser(PostLoginUserReq postLoginUserReq) throws BaseException {
