@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByEmail(String email); // 이메일로 회원 찾기
+
+    Optional<Member> findByEmailAndProvider(String email, String provider); // 이메일과 로그인 타입으로 회원 찾기
 }

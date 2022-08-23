@@ -20,8 +20,10 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
     private String email;
+    private String name; // 유저 이름
     private String password;
-
+    private String provider; // SNS 로그인 종류
+    private Boolean emailAuth; // 이메일 인증 여부
     @Column(columnDefinition = "TEXT")
     private String refreshToken; // 리프레시 토큰
 
@@ -31,10 +33,13 @@ public class Member {
     private List<Role> roles = new ArrayList<>();
 
     @Builder
-    public Member(String email, String password, List<Role> roles){
+    public Member(String email, String name, String password, String provider, List<Role> roles, Boolean emailAuth){
         this.email = email;
+        this.name = name;
         this.password = password;
+        this.provider = provider;
         this.roles = Collections.singletonList(Role.ROLE_MEMBER);
+        this.emailAuth = emailAuth;
     }
 
     public void addRole(Role role){
@@ -43,5 +48,9 @@ public class Member {
 
     public void updateRefreshToken(String refreshToken){
         this.refreshToken = refreshToken;
+    }
+
+    public void emailVerifiedSuccess() {
+        this.emailAuth = true;
     }
 }

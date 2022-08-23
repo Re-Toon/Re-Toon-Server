@@ -7,15 +7,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
 
-public class MemberDetail implements UserDetails {
-    private String username;
+public class MemberDetails implements UserDetails {
+    private String email;
     private String password;
     private List<GrantedAuthority> authorities;
 
 
     @Builder
-    public MemberDetail(String username, String password, List<GrantedAuthority> authorities) {
-        this.username = username;
+    public MemberDetails(String email, String password, List<GrantedAuthority> authorities) {
+        this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
@@ -32,7 +32,7 @@ public class MemberDetail implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override
