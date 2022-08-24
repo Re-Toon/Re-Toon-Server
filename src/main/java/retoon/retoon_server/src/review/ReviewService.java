@@ -2,6 +2,7 @@ package retoon.retoon_server.src.review;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponseStatus;
@@ -9,10 +10,7 @@ import retoon.retoon_server.src.review.entity.Comment;
 import retoon.retoon_server.src.review.entity.Review;
 import retoon.retoon_server.src.review.entity.ReviewLike;
 import retoon.retoon_server.src.review.entity.ReviewUnlike;
-import retoon.retoon_server.src.review.model.GetCommentRes;
-import retoon.retoon_server.src.review.model.GetReviewRes;
-import retoon.retoon_server.src.review.model.PostCommentReq;
-import retoon.retoon_server.src.review.model.PostReviewReq;
+import retoon.retoon_server.src.review.model.*;
 import retoon.retoon_server.src.review.repository.CommentRepository;
 import retoon.retoon_server.src.review.repository.ReviewLikeRepository;
 import retoon.retoon_server.src.review.repository.ReviewRepository;
@@ -169,14 +167,14 @@ public class ReviewService {
         Review review = reviewRepository.getReferenceById(reviewIdx);
         List<Comment> comments = review.getComments();
         List<GetCommentRes> commentRes = new ArrayList<>();
-        for(int i=0; i < comments.size(); i++){
+        for (int i = 0; i < comments.size(); i++) {
             commentRes.add(new GetCommentRes(comments.get(i)));
         }
         GetReviewRes res = new GetReviewRes(review);
         res.setComments(commentRes);
+        res.setCommentCnt(commentRes.size());
         return res;
     }
-
 
 
     @Transactional
@@ -204,5 +202,25 @@ public class ReviewService {
         commentRepository.delete(comment);
     }
 
+    @Transactional
+    public List<GetReviewListRes> getReviewList(int sort) throws BaseException {
+        if (sort <= 0 || sort >= 4) {
+            throw new BaseException(BaseResponseStatus.INVALID_SORT);
+        }
+        List<GetReviewListRes> res = new ArrayList<>();
+        List<Review> reviews = new ArrayList<>();
+        if (sort == 1) {
+            reviews = reviewRepository.findAll(Sort.by(Sort.Direction.DESC, "reviewStarRate"));
+        }
+        else if (sort == 2)
+            reviews = reviewRepository.findAll(Sort.by(Sort.Direction.DESC, "reviewLikeCnt"));
+        else if (sort == 3) {
+            reviews = reviewRepository.findAll(Sort.by(Sort.Direction.DESC, "updatedAT"));
+        }
+        for (int i = 0; i < reviews.size(); i++) {
+            res.add(new GetReviewListRes(reviews.get(i)));
+        }
+        return res;
+    }
 }
 

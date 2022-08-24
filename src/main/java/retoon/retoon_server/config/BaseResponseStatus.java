@@ -31,6 +31,7 @@ public enum BaseResponseStatus {
     EMPTY_COMMENT_TEXT(false, 2013, "댓글을 입력해주세요."),
     EMPTY_COMMENT_IDX(false, 2014, "존재하지 않는 댓글입니다."),
     INVALID_COMMENT_USER(false, 2015, "댓글을 쓴 유저가 아닙니다."),
+    INVALID_SORT(false, 2016, "올바른 정렬 기준 값이 아닙니다."),
 
 
     FAILED_ON_SERVER(false, 100, "예기치 못한 에러가 발생했습니다."),

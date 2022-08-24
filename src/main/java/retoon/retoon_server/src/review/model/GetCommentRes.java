@@ -24,7 +24,6 @@ public class GetCommentRes {
         /* Entity -> Dto*/
 
     public GetCommentRes(Comment comment) {
-
         this.nickname = comment.getUser().getNickname();
         this.commentText = comment.getCommentText();
         this.createdAT = comment.getCreatedAT();

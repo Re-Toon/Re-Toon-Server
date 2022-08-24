@@ -25,6 +25,7 @@ public class GetReviewRes {
     private int reviewLike;
     private int reviewUnlike;
     private List<GetCommentRes> comments;
+    private int commentCnt;
 
     /*Entity ->Dto*/
     public GetReviewRes(Review review) {
