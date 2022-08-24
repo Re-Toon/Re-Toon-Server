@@ -1,4 +1,4 @@
-package retoon.retoon_server.src.review.model;
+package retoon.retoon_server.src.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCommentReq {
-    private Long reviewIdx;
-    private String commentText;
+public class UserLoginRequestDto {
+    private String email;
+    private String password;
 }
-

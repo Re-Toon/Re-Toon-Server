@@ -21,11 +21,9 @@ import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.repository.UserRepository;
 
 import javax.transaction.Transactional;
-import java.sql.SQLOutput;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

@@ -23,7 +23,4 @@ public class UserGenre {
     @JoinColumn(name = "userIdx")
     @JsonBackReference // 순환참조 문제를 해결하기 위해 적용, 직렬화가 되지 않도록 수행
     private User user;
-
 }
-
-

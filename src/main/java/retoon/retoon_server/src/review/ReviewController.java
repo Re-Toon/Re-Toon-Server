@@ -1,12 +1,10 @@
 package retoon.retoon_server.src.review;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
-import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.review.model.PostCommentReq;
 import retoon.retoon_server.src.review.model.PostReviewReq;
 import retoon.retoon_server.utils.JwtService;
