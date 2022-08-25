@@ -12,7 +12,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 public class Follow {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int followIdx;

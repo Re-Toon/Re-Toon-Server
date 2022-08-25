@@ -22,8 +22,8 @@ public class GetReviewRes {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime updatedAT;
 
-    private int reviewLike;
-    private int reviewUnlike;
+    private int reviewLikeCnt;
+    private int reviewUnlikeCnt;
     private List<GetCommentRes> comments;
     private int commentCnt;
 
@@ -33,8 +33,8 @@ public class GetReviewRes {
         this.reviewText = review.getReviewText();
         this.reviewStarRate = review.getReviewStarRate();
         this.updatedAT = review.getUpdatedAT();
-        this.reviewLike = review.getReviewLikes().size();
-        this.reviewUnlike = review.getReviewUnlikes().size();
+        this.reviewLikeCnt = review.getReviewLikes().size();
+        this.reviewUnlikeCnt = review.getReviewUnlikes().size();
     }
 
 

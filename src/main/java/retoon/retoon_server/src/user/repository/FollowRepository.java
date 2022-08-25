@@ -10,6 +10,7 @@ import retoon.retoon_server.src.user.entity.User;
 @Repository
 public interface FollowRepository extends JpaRepository<Follow, Integer> {
     Follow findFollowByFromUserAndToUser(User fromUser, User toUser);
+
     @Query("SELECT COUNT(f) FROM Follow f WHERE f.fromUser.userIdx=:fromUserIdx")
     int findFollowingCountByToUserIdx(@Param("fromUserIdx") int userIdx); // 팔로잉 수, fromUserIdx 개수 측정
 

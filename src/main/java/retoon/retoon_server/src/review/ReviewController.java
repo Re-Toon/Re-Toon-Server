@@ -1,12 +1,12 @@
 package retoon.retoon_server.src.review;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
+import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.review.model.PostCommentReq;
 import retoon.retoon_server.src.review.model.PostReviewReq;
 import retoon.retoon_server.utils.JwtService;
@@ -38,7 +38,7 @@ public class ReviewController {
 
     /**
      * 리뷰 수정하기
-     * [PATCH] /reviews?reviewIdx=
+     * [PATCH] /reviews
      */
     @PatchMapping("")
     public BaseResponse editReview(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx, @RequestBody PostReviewReq postReviewReq) {
@@ -53,7 +53,7 @@ public class ReviewController {
 
     /**
      * 리뷰 삭제하기
-     * [DELETE] /reviews?reviewIdx=
+     * [DELETE] /reviews
      */
     @DeleteMapping("")
     public BaseResponse deleteReview(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
@@ -65,25 +65,23 @@ public class ReviewController {
             return new BaseResponse(exception.getStatus());
         }
     }
-
     /**
      * 리뷰 좋아요
-     * [POST] /reviews/like?reviewIdx=
+     * [POST] /reviews/like
      */
     @PostMapping("/like")
     public BaseResponse addReviewLike(@RequestParam Long reviewIdx) {
-        try {
-            int userIdx = jwtService.getUserIdx();
-            reviewService.addReviewLike(userIdx, reviewIdx);
+        try{
+            //int userIdx = jwtService.getUserIdx();
+            reviewService.addReviewLike(2, reviewIdx);
             return new BaseResponse("OK");
-        } catch (BaseException exception) {
+        }catch (BaseException exception) {
             return new BaseResponse(exception.getStatus());
         }
     }
-
     /**
      * 리뷰 좋아요 취소
-     * [DELETE] /reviews/like?reviewIdx=
+     * [DELETE] /reviews/like
      */
     @DeleteMapping("/like")
     public BaseResponse deleteReviewLike(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
@@ -98,22 +96,22 @@ public class ReviewController {
 
     /**
      * 리뷰 싫어요
-     * [POST] /reviews/unlike?reviewIdx=
+     * [POST] /reviews/unlike
      */
     @PostMapping("/unlike")
     public BaseResponse addReviewUnlike(@RequestParam Long reviewIdx) {
-        try {
+        try{
             int userIdx = jwtService.getUserIdx();
             reviewService.addReviewUnlike(userIdx, reviewIdx);
             return new BaseResponse("OK");
-        } catch (BaseException exception) {
+        }catch (BaseException exception) {
             return new BaseResponse(exception.getStatus());
         }
     }
 
     /**
      * 리뷰 싫어요 취소
-     * [DELETE] /reviews/like?reviewIdx=
+     * [DELETE] /reviews/like
      */
     @DeleteMapping("/unlike")
     public BaseResponse deleteReviewUnlike(@RequestParam(value = "reviewIdx", required = true) Long reviewIdx) {
@@ -128,72 +126,50 @@ public class ReviewController {
 
     /**
      * 리뷰 게시물 조회
-     * [GET] /reviews?reviewIdx=
+     * [GET] /reviews
      */
     @GetMapping("")
     public BaseResponse getReview(@RequestParam Long reviewIdx) {
         try {
+            reviewService.getReview(reviewIdx);
             return new BaseResponse(reviewService.getReview(reviewIdx));
-        } catch (BaseException exception) {
+        }
+        catch (BaseException exception){
             return new BaseResponse(exception.getStatus());
         }
     }
 
     /**
      * 리뷰 댓글 추가
-     * [POST] /reviews/comments
+     * [POST] /reviews/comment
      */
-    @PostMapping("/comments")
+    @PostMapping("/comment")
     public BaseResponse createComment(@RequestBody PostCommentReq postCommentReq) {
-        try {
+        try{
             int userIdx = jwtService.getUserIdx();
             reviewService.createComment(userIdx, postCommentReq);
             return new BaseResponse("OK");
-        } catch (BaseException exception) {
+        }catch (BaseException exception) {
             return new BaseResponse(exception.getStatus());
         }
     }
 
     /**
      * 리뷰 댓글 삭제
-     * [PATCH] /reviews/comments?commentIdx=
+     * [PATCH] /reviews/comment
      */
-    @PatchMapping("/comments")
-    public BaseResponse deleteComment(@RequestParam Long commentIdx) {
-        try {
+    @PatchMapping("/comment")
+    public BaseResponse deleteComment(@RequestParam Long commentIdx){
+        try{
             int userIdx = jwtService.getUserIdx();
             reviewService.deleteComment(userIdx, commentIdx);
             return new BaseResponse("OK");
-        } catch (BaseException exception) {
+        }
+        catch (BaseException exception){
             return new BaseResponse(exception.getStatus());
         }
     }
 
-    /**
-     * 리뷰 리스트 조회
-     * [GET] /reviews/lists?sort=
-     */
-    @GetMapping("/lists")
-    public BaseResponse getReviewList(@RequestParam int sort) {
-        try {
-            return new BaseResponse(reviewService.getReviewList(sort));
-        } catch (BaseException exception) {
-            return new BaseResponse(exception.getStatus());
-        }
-    }
-
-    /**
-     * 작품별 리뷰 리스트 조회
-     * [GET] reviews/lists?webtoonIdx=
-     */
-    @GetMapping("/lists")
-    public BaseResponse getWebtoonReviewList(@RequestParam int webtoonIdx){
-        try {
-            return new BaseResponse(reviewService.getWebtoonReviewList(webtoonIdx));
-        }catch (BaseException exception){
-            return new BaseResponse(exception.getStatus());
-        }
-    }
 
 
 }
