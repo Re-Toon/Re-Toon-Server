@@ -1,5 +1,6 @@
 package retoon.retoon_server.src.review;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -217,6 +218,16 @@ public class ReviewService {
         else if (sort == 3) {
             reviews = reviewRepository.findAll(Sort.by(Sort.Direction.DESC, "updatedAT"));
         }
+        for (int i = 0; i < reviews.size(); i++) {
+            res.add(new GetReviewListRes(reviews.get(i)));
+        }
+        return res;
+    }
+
+    @Transactional
+    public List<GetReviewListRes> getWebtoonReviewList(int webtoonIdx) throws BaseException{
+        List<GetReviewListRes> res = new ArrayList<>();
+        List<Review> reviews = reviewRepository.findByWebtoonIdx(webtoonIdx);
         for (int i = 0; i < reviews.size(); i++) {
             res.add(new GetReviewListRes(reviews.get(i)));
         }

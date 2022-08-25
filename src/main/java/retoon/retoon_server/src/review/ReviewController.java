@@ -182,5 +182,18 @@ public class ReviewController {
         }
     }
 
+    /**
+     * 작품별 리뷰 리스트 조회
+     * [GET] reviews/lists?webtoonIdx=
+     */
+    @GetMapping("/lists")
+    public BaseResponse getWebtoonReviewList(@RequestParam int webtoonIdx){
+        try {
+            return new BaseResponse(reviewService.getWebtoonReviewList(webtoonIdx));
+        }catch (BaseException exception){
+            return new BaseResponse(exception.getStatus());
+        }
+    }
+
 
 }
