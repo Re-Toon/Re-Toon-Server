@@ -7,10 +7,13 @@ import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.FollowResponseDto;
+import retoon.retoon_server.src.user.model.GetFollowResponseDto;
 import retoon.retoon_server.src.user.model.UserProfileDto;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
 import retoon.retoon_server.src.user.service.UserService;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -90,6 +93,35 @@ public class UserController {
         }
         catch (BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * GET / 마이페이지 리뷰어 팔로워 목록 조회
+     * parameter userIdx, login email
+     * return
+     * */
+    @GetMapping("/follow/{userIdx}/follower")
+    public BaseResponse<List<GetFollowResponseDto>> getFollower(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+        try{
+            return new BaseResponse<>(userService.getFollowerListByUserIdx(userIdx, loginEmail));
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * GET / 마이페이지 리뷰어 팔로잉 목록 조회
+     * parameter userIdx, login email 현재 마이페이지 유저의 인덱스, 로그인한 유저 이메일
+     * */
+    @GetMapping("/follow/{userIdx}/following")
+    public BaseResponse<List<GetFollowResponseDto>> getFollowing(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+        try{
+            return new BaseResponse<>(userService.getFollowingListByUserIdx(userIdx, loginEmail));
+        }
+        catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 }

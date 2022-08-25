@@ -1,6 +1,7 @@
 package retoon.retoon_server.src.user.service;
 
 import lombok.RequiredArgsConstructor;
+import org.qlrm.mapper.JpaResultMapper;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponseStatus;
@@ -9,11 +10,17 @@ import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.entity.UserGenre;
 import retoon.retoon_server.src.user.model.FollowResponseDto;
 import retoon.retoon_server.src.user.model.FollowUserResponseDto;
+import retoon.retoon_server.src.user.model.GetFollowResponseDto;
 import retoon.retoon_server.src.user.model.UserProfileDto;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,6 +29,8 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final FollowRepository followRepository;
+    @PersistenceContext
+    private EntityManager entityManager; // entity 관리, 스프링에서 주입받기 위해 작성
 
     /** 프로필 생성 */
     public void createProfile(int userIdx, UserProfileDto profileDto) throws BaseException {
@@ -144,5 +153,56 @@ public class UserService {
         return new FollowResponseDto(follow.getFollowIdx(), getFollower, getFollowee); // 팔로우 객체 반환
     }
 
+    /** 유저 팔로워 목록 조회 */
+    public List<GetFollowResponseDto> getFollowerListByUserIdx(int userIdx, String loginEmail) throws BaseException {
+        Optional<User> visitedUser = userRepository.findByUserIdx(userIdx); // 방문한 페이지의 사용자
+        if(visitedUser.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        Optional<User> user = userRepository.findByEmail(loginEmail);
+        if(user.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        int loginIdx = user.get().getUserIdx();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("SELECT u.user_idx, u.nickname, u.img_url, ");
+        stringBuffer.append("if ((SELECT 1 FROM follow WHERE from_user_idx = ? AND to_user_idx = u.user_idx), TRUE, FALSE) As followState, ");
+        stringBuffer.append("if ((?=u.user_idx), TRUE, FALSE) As loginUser ");
+        stringBuffer.append("FROM user u, follow f ");
+        stringBuffer.append("WHERE u.user_idx = f.from_user_idx AND f.to_user_idx = ?");
+
+        Query query = entityManager.createNativeQuery(stringBuffer.toString())
+                .setParameter(1, loginIdx)
+                .setParameter(2, loginIdx)
+                .setParameter(3, userIdx);
+
+        JpaResultMapper result = new JpaResultMapper();
+        return result.list(query, GetFollowResponseDto.class);
+    }
+
+    /** 유저 팔로잉 목록 조회 */
+    public List<GetFollowResponseDto> getFollowingListByUserIdx(int userIdx, String loginEmail) throws BaseException {
+        Optional<User> visitedUser = userRepository.findByUserIdx(userIdx); // 방문한 페이지의 사용자
+        if(visitedUser.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        Optional<User> user = userRepository.findByEmail(loginEmail);
+        if(user.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        int loginIdx = user.get().getUserIdx();
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("SELECT u.user_idx, u.nickname, u.img_url, ");
+        stringBuffer.append("if ((SELECT 1 FROM follow WHERE from_user_idx = ? AND to_user_idx = u.user_idx), TRUE, FALSE) As followState,");
+        stringBuffer.append("if ((?=u.user_idx), TRUE, FALSE) As loginUser ");
+        stringBuffer.append("FROM user u, follow f ");
+        stringBuffer.append("WHERE u.user_idx = f.to_user_idx AND f.from_user_idx = ?");
+
+        Query query = entityManager.createNativeQuery(stringBuffer.toString())
+                .setParameter(1, loginIdx)
+                .setParameter(2, loginIdx)
+                .setParameter(3, userIdx);
+
+        JpaResultMapper result = new JpaResultMapper();
+        return result.list(query, GetFollowResponseDto.class);
+    }
 
 }
