@@ -5,9 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
 import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.config.BaseResponseStatus;
-import retoon.retoon_server.src.user.entity.User;
-import retoon.retoon_server.src.user.model.FollowResponseDto;
-import retoon.retoon_server.src.user.model.GetFollowResponseDto;
+import retoon.retoon_server.src.user.model.FollowResDto;
+import retoon.retoon_server.src.user.model.FollowListObjResDto;
 import retoon.retoon_server.src.user.model.UserProfileDto;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
@@ -66,9 +65,9 @@ public class UserController {
      * return FollowResponseDto
      * */
     @PostMapping("/follow/{fromUserIdx}/{toUserIdx}")
-    public BaseResponse<FollowResponseDto> followUser(@PathVariable("fromUserIdx") int fromUserIdx, @PathVariable("toUserIdx") int toUserIdx) throws BaseException {
+    public BaseResponse<FollowResDto> followUser(@PathVariable("fromUserIdx") int fromUserIdx, @PathVariable("toUserIdx") int toUserIdx) throws BaseException {
         try{
-            FollowResponseDto follow = userService.followUser(fromUserIdx, toUserIdx); // 팔로우 정보 반환
+            FollowResDto follow = userService.followUser(fromUserIdx, toUserIdx); // 팔로우 정보 반환
             return new BaseResponse<>(follow); // 팔로우 정보 전달
         }
         catch (BaseException exception){
@@ -102,7 +101,7 @@ public class UserController {
      * return
      * */
     @GetMapping("/follow/{userIdx}/follower")
-    public BaseResponse<List<GetFollowResponseDto>> getFollower(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+    public BaseResponse<List<FollowListObjResDto>> getFollower(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
         try{
             return new BaseResponse<>(userService.getFollowerListByUserIdx(userIdx, loginEmail));
         }
@@ -116,7 +115,7 @@ public class UserController {
      * parameter userIdx, login email 현재 마이페이지 유저의 인덱스, 로그인한 유저 이메일
      * */
     @GetMapping("/follow/{userIdx}/following")
-    public BaseResponse<List<GetFollowResponseDto>> getFollowing(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
+    public BaseResponse<List<FollowListObjResDto>> getFollowing(@PathVariable("userIdx") int userIdx, @RequestParam String loginEmail){
         try{
             return new BaseResponse<>(userService.getFollowingListByUserIdx(userIdx, loginEmail));
         }

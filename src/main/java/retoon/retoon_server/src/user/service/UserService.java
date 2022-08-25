@@ -8,9 +8,9 @@ import retoon.retoon_server.config.BaseResponseStatus;
 import retoon.retoon_server.src.user.entity.Follow;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.entity.UserGenre;
-import retoon.retoon_server.src.user.model.FollowResponseDto;
-import retoon.retoon_server.src.user.model.FollowUserResponseDto;
-import retoon.retoon_server.src.user.model.GetFollowResponseDto;
+import retoon.retoon_server.src.user.model.FollowResDto;
+import retoon.retoon_server.src.user.model.FollowUserResDto;
+import retoon.retoon_server.src.user.model.FollowListObjResDto;
 import retoon.retoon_server.src.user.model.UserProfileDto;
 import retoon.retoon_server.src.user.repository.FollowRepository;
 import retoon.retoon_server.src.user.repository.UserRepository;
@@ -18,7 +18,6 @@ import retoon.retoon_server.src.user.repository.UserRepository;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
@@ -130,7 +129,7 @@ public class UserService {
 
     /** 팔로우 활성화, 팔로우 관계 저장 */
     @Transactional
-    public FollowResponseDto followUser(int fromUserIdx, int toUserIdx) throws BaseException {
+    public FollowResDto followUser(int fromUserIdx, int toUserIdx) throws BaseException {
         Optional<User> fromUser = userRepository.findByUserIdx(fromUserIdx);
         Optional<User> toUser = userRepository.findByUserIdx(toUserIdx);
 
@@ -147,14 +146,14 @@ public class UserService {
 
 
         User getFromUser = follow.getFromUser(); User getToUser = follow.getToUser(); // follower, followee 정보 반환
-        FollowUserResponseDto getFollower = new FollowUserResponseDto(getFromUser.getUserIdx(), getFromUser.getImgUrl(), getFromUser.getNickname(), getFromUser.getIntroduce());
-        FollowUserResponseDto getFollowee = new FollowUserResponseDto(getToUser.getUserIdx(), getToUser.getImgUrl(), getToUser.getNickname(), getToUser.getIntroduce());
+        FollowUserResDto getFollower = new FollowUserResDto(getFromUser.getUserIdx(), getFromUser.getImgUrl(), getFromUser.getNickname(), getFromUser.getIntroduce());
+        FollowUserResDto getFollowee = new FollowUserResDto(getToUser.getUserIdx(), getToUser.getImgUrl(), getToUser.getNickname(), getToUser.getIntroduce());
 
-        return new FollowResponseDto(follow.getFollowIdx(), getFollower, getFollowee); // 팔로우 객체 반환
+        return new FollowResDto(follow.getFollowIdx(), getFollower, getFollowee); // 팔로우 객체 반환
     }
 
     /** 유저 팔로워 목록 조회 */
-    public List<GetFollowResponseDto> getFollowerListByUserIdx(int userIdx, String loginEmail) throws BaseException {
+    public List<FollowListObjResDto> getFollowerListByUserIdx(int userIdx, String loginEmail) throws BaseException {
         Optional<User> visitedUser = userRepository.findByUserIdx(userIdx); // 방문한 페이지의 사용자
         if(visitedUser.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
 
@@ -176,11 +175,11 @@ public class UserService {
                 .setParameter(3, userIdx);
 
         JpaResultMapper result = new JpaResultMapper();
-        return result.list(query, GetFollowResponseDto.class);
+        return result.list(query, FollowListObjResDto.class);
     }
 
     /** 유저 팔로잉 목록 조회 */
-    public List<GetFollowResponseDto> getFollowingListByUserIdx(int userIdx, String loginEmail) throws BaseException {
+    public List<FollowListObjResDto> getFollowingListByUserIdx(int userIdx, String loginEmail) throws BaseException {
         Optional<User> visitedUser = userRepository.findByUserIdx(userIdx); // 방문한 페이지의 사용자
         if(visitedUser.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
 
@@ -202,7 +201,7 @@ public class UserService {
                 .setParameter(3, userIdx);
 
         JpaResultMapper result = new JpaResultMapper();
-        return result.list(query, GetFollowResponseDto.class);
+        return result.list(query, FollowListObjResDto.class);
     }
 
 }
