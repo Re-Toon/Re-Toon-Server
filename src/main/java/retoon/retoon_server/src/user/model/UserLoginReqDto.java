@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserLoginResponseDto {
-    private int userIdx;
-    private String accessToken;
-    private String refreshToken;
+public class UserLoginReqDto {
+    private String email;
+    private String password;
 }

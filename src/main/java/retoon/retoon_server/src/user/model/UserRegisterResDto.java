@@ -5,13 +5,13 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRegisterResponseDto {
+public class UserRegisterResDto {
     private int userIdx;
     private String email;
     private String authToken;
 
     @Builder
-    public UserRegisterResponseDto(int userIdx, String email, String authToken) {
+    public UserRegisterResDto(int userIdx, String email, String authToken) {
         this.userIdx = userIdx;
         this.email = email;
         this.authToken = authToken;

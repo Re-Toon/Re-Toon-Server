@@ -9,8 +9,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FollowResponseDto {
-    int followIdx; // 팔로우 정보
-    FollowUserResponseDto follower; // 팔로우한 사람
-    FollowUserResponseDto followee; // 팔로우 당한 사람
+public class UserPasswordResetReqDto {
+    private String email;
+    private String password;
+    private String passwordCheck;
 }

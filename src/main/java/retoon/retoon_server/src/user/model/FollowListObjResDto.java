@@ -9,14 +9,14 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class GetFollowResponseDto {
+public class FollowListObjResDto {
     private int userIdx;
     private String nickname;
     private String imgUrl;
     private int followState; // 팔로우 관계인지의 여부
     private int loginUser; // 로그인한 사용자 여부
 
-    public GetFollowResponseDto(int userIdx, String nickname, String imgUrl, BigInteger followState, BigInteger loginUser){
+    public FollowListObjResDto(int userIdx, String nickname, String imgUrl, BigInteger followState, BigInteger loginUser){
         this.userIdx = userIdx;
         this.nickname = nickname;
         this.imgUrl = imgUrl;
