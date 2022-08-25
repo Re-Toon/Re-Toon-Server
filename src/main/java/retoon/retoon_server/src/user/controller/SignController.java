@@ -1,6 +1,5 @@
 package retoon.retoon_server.src.user.controller;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import retoon.retoon_server.config.BaseException;
@@ -22,9 +21,9 @@ public class SignController {
      * return UserRegisterResponseDto
      * */
     @PostMapping("/register")
-    public BaseResponse<UserRegisterResponseDto> register(@RequestBody UserRegisterRequestDto requestDto) {
+    public BaseResponse<UserRegisterResDto> register(@RequestBody UserRegisterReqDto requestDto) {
         try{
-            UserRegisterResponseDto responseDto = signService.registerUser(requestDto);
+            UserRegisterResDto responseDto = signService.registerUser(requestDto);
             return new BaseResponse<>(responseDto);
         }
         catch(BaseException exception){ return new BaseResponse<>(exception.getStatus()); }
@@ -36,7 +35,7 @@ public class SignController {
      * return String
      * */
     @GetMapping("/confirm-email")
-    public BaseResponse<String> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
+    public BaseResponse<String> confirmEmail(@RequestBody EmailAuthReqDto requestDto) {
         try{
             signService.confirmEmail(requestDto);
             return new BaseResponse<>("인증이 완료되었습니다.");
@@ -51,10 +50,10 @@ public class SignController {
      * */
 
     @PostMapping("/login")
-    public BaseResponse<UserLoginResponseDto> login(@RequestBody UserLoginRequestDto requestDto){
+    public BaseResponse<UserLoginResDto> login(@RequestBody UserLoginReqDto requestDto){
         try{
             signService.checkLogin(requestDto);
-            UserLoginResponseDto responseDto = signService.loginUser(requestDto);
+            UserLoginResDto responseDto = signService.loginUser(requestDto);
             return new BaseResponse<>(responseDto);
         }
         catch(BaseException exception) { return new BaseResponse<>(exception.getStatus()); }
@@ -66,10 +65,10 @@ public class SignController {
      * return TokenResponseDto
      * */
     @PostMapping("/reissue")
-    public BaseResponse<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
+    public BaseResponse<TokenResDto> reIssue(@RequestBody TokenReqDto tokenReqDto) {
         try{
-            signService.checkToken(tokenRequestDto); // 토큰 만료 확인
-            TokenResponseDto responseDto = signService.reIssue(tokenRequestDto); // 토큰 재발급 진행
+            signService.checkToken(tokenReqDto); // 토큰 만료 확인
+            TokenResDto responseDto = signService.reIssue(tokenReqDto); // 토큰 재발급 진행
             return new BaseResponse<>(responseDto);
         }
         catch(BaseException exception) { return new BaseResponse<>(exception.getStatus()); }
@@ -87,9 +86,9 @@ public class SignController {
     }
 
     @GetMapping(value = "/login/{provider}/callback")
-    public BaseResponse<UserLoginResponseDto> callback(@PathVariable(name = "provider") String provider,
-                                                       @RequestParam(name = "code") String code) {
-        UserLoginResponseDto responseDto = signService.loginUserByProvider(code, provider);
+    public BaseResponse<UserLoginResDto> callback(@PathVariable(name = "provider") String provider,
+                                                  @RequestParam(name = "code") String code) {
+        UserLoginResDto responseDto = signService.loginUserByProvider(code, provider);
         return new BaseResponse<>(responseDto);
     }
 
@@ -103,6 +102,41 @@ public class SignController {
         try{
             signService.disabledUser(userIdx); // 회원 탈퇴 진행
             String result = "회원 탈퇴를 완료했습니다.";
+            return new BaseResponse<>(result);
+        }
+        catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * GET / 비밀번호 확인 API
+     * parameter UserPasswordRequestDto
+     * return string
+     * */
+    @GetMapping("/verify-password")
+    public BaseResponse<String> verifyPwd(@RequestBody UserPasswordReqDto requestDto) {
+        try{
+            signService.checkEqualPwd(requestDto);
+            String result = "비밀번호가 일치합니다.";
+            return new BaseResponse<>(result);
+        }
+        catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+    /**
+     * PATCH / 비밀번호 재설정 API
+     * parameter UserPasswordResetReqDto
+     * return String
+     * */
+    @PatchMapping("/reset-password")
+    public BaseResponse<String> resetPwd(@RequestBody UserPasswordResetReqDto requestDto){
+        try{
+            signService.resetPwd(requestDto);
+            String result = "비밀번호 재설정을 완료했습니다.";
             return new BaseResponse<>(result);
         }
         catch(BaseException exception){

@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import retoon.retoon_server.config.BaseException;
-import retoon.retoon_server.config.BaseResponse;
 import retoon.retoon_server.config.BaseResponseStatus;
+import retoon.retoon_server.src.user.converter.ProviderConverter;
 import retoon.retoon_server.src.user.entity.EmailAuth;
-import retoon.retoon_server.src.user.entity.Role;
+import retoon.retoon_server.src.user.entity.Provider;
 import retoon.retoon_server.src.user.entity.User;
 import retoon.retoon_server.src.user.model.*;
 import retoon.retoon_server.src.user.repository.EmailAuthRepository;
@@ -17,7 +17,6 @@ import retoon.retoon_server.utils.SHA256;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,11 +31,12 @@ public class SignService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final EmailAuthRepository emailAuthRepository;
+    private final ProviderConverter providerConverter;
 
     /** 회원가입 */
     @SneakyThrows
     @Transactional
-    public UserRegisterResponseDto registerUser(UserRegisterRequestDto requestDto) throws BaseException {
+    public UserRegisterResDto registerUser(UserRegisterReqDto requestDto) throws BaseException {
         checkSignUp(requestDto); // 회원가입 시 예외사항 처리
         // 이메일 인증 저장
         EmailAuth emailAuth = emailAuthRepository.save(
@@ -61,7 +61,7 @@ public class SignService {
 
         // 이메일 전송
         emailService.send(emailAuth.getEmail(), emailAuth.getAuthToken());
-        return UserRegisterResponseDto.builder()
+        return UserRegisterResDto.builder()
                 .userIdx(user.getUserIdx())
                 .email(user.getEmail())
                 .authToken(emailAuth.getAuthToken())
@@ -71,7 +71,7 @@ public class SignService {
 
     /** SNS 로그인 */
     @Transactional
-    public UserLoginResponseDto loginUserByProvider(String code, String provider){
+    public UserLoginResDto loginUserByProvider(String code, String provider){
         String accessToken = socialService.extractAccessToken(provider, code);
         SocialProfileDto profile = socialService.getUserProfileInfo(provider, accessToken);
 
@@ -81,13 +81,13 @@ public class SignService {
             user.updateAccessToken(jwtService.createJwt(user.getUserIdx()));
             user.updateRefreshToken(jwtService.createRefreshJwt());
             user.setUpdatedAT();
-            return new UserLoginResponseDto(user.getUserIdx(), user.getAccessToken(), user.getRefreshToken());
+            return new UserLoginResDto(user.getUserIdx(), user.getAccessToken(), user.getRefreshToken());
         }
         else{ // 새롭게 회원가입이 필요한 경우
             User saveUser = saveUser(profile, provider);
             saveUser.updateAccessToken(jwtService.createJwt(saveUser.getUserIdx()));
             saveUser.updateRefreshToken(jwtService.createRefreshJwt());
-            return new UserLoginResponseDto(saveUser.getUserIdx(), saveUser.getAccessToken(), saveUser.getRefreshToken());
+            return new UserLoginResDto(saveUser.getUserIdx(), saveUser.getAccessToken(), saveUser.getRefreshToken());
         }
     }
 
@@ -106,7 +106,7 @@ public class SignService {
     }
 
     /** 이메일 인증 확인 */
-    public void confirmEmail(EmailAuthRequestDto requestDto) throws BaseException {
+    public void confirmEmail(EmailAuthReqDto requestDto) throws BaseException {
         Optional<EmailAuth> emailAuth = emailAuthRepository.findValidAuthByEmail(requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now());
         if(emailAuth.isEmpty()){ throw new BaseException(BaseResponseStatus.NOT_VALID_AUTH_TOKEN); }
 
@@ -120,7 +120,7 @@ public class SignService {
     }
 
     /** 회원가입 시 예외사항 확인 */
-    public void checkSignUp(UserRegisterRequestDto requestDto) throws BaseException {
+    public void checkSignUp(UserRegisterReqDto requestDto) throws BaseException {
         // 사용자 이름을 입력하지 않은 경우
         if(requestDto.getName() == null || requestDto.getName().equals("")){
             throw new BaseException(BaseResponseStatus.EMPTY_USER_NAME);
@@ -163,7 +163,7 @@ public class SignService {
     }
 
     /** 로그인 시 예외사항 확인 */
-    public void checkLogin(UserLoginRequestDto requestDto) throws BaseException {
+    public void checkLogin(UserLoginReqDto requestDto) throws BaseException {
         // 이메일을 입력하지 않은 경우
         if(requestDto.getEmail() == null || requestDto.getEmail().equals("")){
             throw new BaseException(BaseResponseStatus.EMPTY_USER_EMAIL);
@@ -180,7 +180,7 @@ public class SignService {
 
     /** 로그인 */
     @Transactional
-    public UserLoginResponseDto loginUser(UserLoginRequestDto requestDto) throws BaseException {
+    public UserLoginResDto loginUser(UserLoginReqDto requestDto) throws BaseException {
         Optional<User> user = userRepository.findByEmail(requestDto.getEmail());
         if(user.isEmpty()){ throw new BaseException(BaseResponseStatus.FAILED_TO_LOGIN); }
 
@@ -189,12 +189,12 @@ public class SignService {
 
         user.get().updateAccessToken(jwtService.createJwt(user.get().getUserIdx()));
         user.get().updateRefreshToken(jwtService.createRefreshJwt());
-        return new UserLoginResponseDto(user.get().getUserIdx(), user.get().getAccessToken(), user.get().getRefreshToken());
+        return new UserLoginResDto(user.get().getUserIdx(), user.get().getAccessToken(), user.get().getRefreshToken());
     }
 
     /** 토큰 재발급 */
     @Transactional
-    public TokenResponseDto reIssue(TokenRequestDto requestDto) throws BaseException {
+    public TokenResDto reIssue(TokenReqDto requestDto) throws BaseException {
         Optional<User> user = userRepository.findByUserIdx(jwtService.getUserIdx());
 
         if(!user.get().getRefreshToken().equals(requestDto.getRefreshToken())) // 리프레시 토큰이 일치하지 않는 경우
@@ -204,11 +204,11 @@ public class SignService {
         String refreshToken = jwtService.createRefreshJwt();
         user.get().updateAccessToken(accessToken);
         user.get().updateRefreshToken(refreshToken);
-        return new TokenResponseDto(accessToken, refreshToken);
+        return new TokenResDto(accessToken, refreshToken);
     }
 
     /** 토큰 만료 확인 */
-    public void checkToken(TokenRequestDto requestDto) throws BaseException {
+    public void checkToken(TokenReqDto requestDto) throws BaseException {
         if(!jwtService.verifyJwt(requestDto.getRefreshToken())) // 토큰이 만료된 경우
             throw new BaseException(BaseResponseStatus.NOT_VALID_REFRESH_TOKEN);
     }
@@ -249,6 +249,43 @@ public class SignService {
             // 유저가 존재하지 않는 경우
             throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS);
         }
+    }
+
+    /** 비밀번호 일치 확인 */
+    public void checkEqualPwd(UserPasswordReqDto requestDto) throws BaseException {
+        Optional<User> user = userRepository.findByEmail(requestDto.getEmail());
+        if(user.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+        if(providerConverter.convert(user.get().getProvider()) != Provider.LOCAL){ throw new BaseException(BaseResponseStatus.CANNOT_RESET_PASSWORD); }
+
+        String encryptPwd = encryptPwd(requestDto.getPassword());
+        if(!user.get().getPassword().equals(encryptPwd)) { throw new BaseException(BaseResponseStatus.NOT_EQUAL_PASSWORD); }
+    }
+
+    /** 비밀번호 재설정 */
+    @Transactional
+    public void resetPwd(UserPasswordResetReqDto requestDto) throws BaseException {
+        Optional<User> user = userRepository.findByEmail(requestDto.getEmail());
+        if(user.isEmpty()) { throw new BaseException(BaseResponseStatus.NOT_EXIST_USERS); }
+
+        if(requestDto.getPassword() == null || requestDto.getPassword().equals("")){ // 사용자 비밀번호를 입력하지 않은 경우
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_PASSWORD);
+        }
+        if(!isRegexPassword(requestDto.getPassword())){ // 비밀번호가 영문, 숫자, 특수문자를 섞어서 넣지 않은 경우
+            throw new BaseException(BaseResponseStatus.POST_USERS_INVALID_PASSWORD);
+        }
+        if(encryptPwd(requestDto.getPassword()).equals(user.get().getPassword())) {
+            throw new BaseException(BaseResponseStatus.EQUAL_BEFORE_PASSWORD); // 이전에 사용한 비밀번호와 같은 경우
+        }
+        if(requestDto.getPasswordCheck() == null || requestDto.getPasswordCheck().equals("")){ // 사용자 비밀번호 확인을 한번 더 입력하지 않은 경우
+            throw new BaseException(BaseResponseStatus.EMPTY_USER_CHECK_PASSWORD);
+        }
+        if(!requestDto.getPasswordCheck().equals(requestDto.getPassword())){ // 사용자 비밀번호와 비밀번호 확인이 일치하지 않는 경우
+            throw new BaseException(BaseResponseStatus.NOT_EQUAL_PASSWORD);
+        }
+
+        String encryptPwd = encryptPwd(requestDto.getPassword());
+        user.get().setPassword(encryptPwd);
+        userRepository.saveAndFlush(user.get()); // DB 반영
     }
 
 }
